@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/industry-278b967c-ea8d-42d7-a329-02b400d43571/styles.css">
+<script src="_ds/industry-278b967c-ea8d-42d7-a329-02b400d43571/_ds_bundle.js"></script>
+<style>
+[data-theme="dark"]{
+  --color-bg:#1a1c1d; --color-surface:#232527; --color-text:#eceded;
+  --color-divider:color-mix(in srgb, #eceded 16%, transparent);
+  --color-neutral-100:#2b2b2d; --color-neutral-200:#333335; --color-neutral-300:#424244;
+  --color-neutral-400:#5d5d60; --color-neutral-500:#7a7a7d; --color-neutral-600:#98989b;
+  --color-neutral-700:#b7b7ba; --color-neutral-800:#d4d4d7; --color-neutral-900:#f5f5f8;
+  --color-accent-100:#1d2d3d; --color-accent-200:#2c455d; --color-accent-300:#416180;
+  --color-accent-400:#597ea3; --color-accent-500:#749dc4; --color-accent-600:#94bce3;
+  --color-accent-700:#b5d9fd; --color-accent-800:#d6ebff; --color-accent-900:#eef6ff;
+  --color-accent:#7fa8cc;
+  --status-inuse:#5fa382; --status-instock:#7fa8cc; --status-repair:#c9a04a; --status-disposed:#9a9a9d;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.5); --shadow-md:0 3px 12px rgba(0,0,0,.55); --shadow-lg:0 16px 40px rgba(0,0,0,.6);
+}
+[data-theme="light"]{
+  --status-inuse:#3f7a5c; --status-instock:#5980a6; --status-repair:#9c7726; --status-disposed:#7a7a7d;
+}
+select.input{appearance:none;-webkit-appearance:none;background-image:none;cursor:pointer}
+body{margin:0}
+.wdi-navbtn{display:flex;align-items:center;gap:10px;padding:9px 12px;font-family:var(--font-body);font-size:14px;color:var(--color-text);background:transparent;border:1px solid transparent;border-radius:var(--radius-md);cursor:pointer;text-align:left;width:100%}
+.wdi-navbtn:hover{background:color-mix(in srgb, var(--color-text) 6%, transparent)}
+.wdi-navbtn.active{background:color-mix(in srgb, var(--color-accent) 14%, transparent);color:var(--color-accent-700);font-weight:500}
+.wdi-row:hover{cursor:pointer}
+.wdi-th-sort{cursor:default}
+.status-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:var(--font-body);padding:3px 9px;border:1px solid;border-radius:0;white-space:nowrap}
+.status-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block}
+.wdi-scroll::-webkit-scrollbar{width:8px;height:8px}
+.wdi-scroll::-webkit-scrollbar-thumb{background:var(--color-divider);border-radius:4px}
+.dialog{background:var(--color-surface) !important}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)" data-theme="{{ theme }}">
+
+<aside style="width:212px;flex:none;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;padding:20px 14px;gap:2px;background:var(--color-surface)">
+  <div style="display:flex;align-items:center;gap:8px;padding:2px 10px 18px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+    <div style="font-family:var(--font-heading);font-weight:600;font-size:17px;line-height:1.1">WDI Asset Registry</div>
+  </div>
+  <button type="button" class="wdi-navbtn {{ dashboardActiveClass }}" onclick="{{ goDashboard }}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+    {{ t.dashboard }}
+  </button>
+  <button type="button" class="wdi-navbtn {{ listActiveClass }}" onclick="{{ goList }}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+    {{ t.assets }}
+  </button>
+  <button type="button" class="wdi-navbtn {{ worklogActiveClass }}" onclick="{{ goWorklog }}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1"></rect><line x1="8" y1="11" x2="16" y2="11"></line><line x1="8" y1="15" x2="16" y2="15"></line><line x1="8" y1="19" x2="12" y2="19"></line></svg>
+    {{ t.workLog }}
+  </button>
+  <button type="button" class="wdi-navbtn {{ settingsActiveClass }}" onclick="{{ goSettings }}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    {{ t.settings }}
+  </button>
+  <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+    <button type="button" class="wdi-navbtn active" onclick="{{ noop }}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="0"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
+      {{ draft.tag }}
+    </button>
+  </sc-if>
+  <div style="flex:1"></div>
+  <div style="border-top:1px solid var(--color-divider);margin:8px 0;padding-top:12px;display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:12px;color:color-mix(in srgb, var(--color-text) 60%, transparent);padding:0 10px">
+      <div style="font-weight:500;color:var(--color-text)">Nattapong T.</div>
+      <div>{{ t.itEngineer }}</div>
+    </div>
+  </div>
+</aside>
+
+<main style="flex:1;min-width:0;padding:28px 36px 48px;overflow-x:hidden">
+
+<sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+<div>
+  <div style="margin-bottom:22px">
+    <h1 style="font-size:26px;margin-bottom:2px">{{ t.dashboard }}</h1>
+    <p style="margin:0;font-size:13px;color:color-mix(in srgb, var(--color-text) 60%, transparent)">{{ t.dashboardSubtitle }}</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px">
+    <div class="card blueprint elev-sm"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div class="card-kicker">{{ t.totalAssets }}</div>
+      <div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1">{{ stats.total }}</div>
+      <div class="card-meta">{{ t.totalAssetsDesc }}</div>
+    </div>
+    <div class="card blueprint elev-sm"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div class="card-kicker">{{ t.inUse }}</div>
+      <div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1;color:var(--status-inuse)">{{ stats.inUse }}</div>
+      <div class="card-meta">{{ t.inUseDesc }}</div>
+    </div>
+    <div class="card blueprint elev-sm"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div class="card-kicker">{{ t.inStock }}</div>
+      <div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1;color:var(--status-instock)">{{ stats.inStock }}</div>
+      <div class="card-meta">{{ t.inStockDesc }}</div>
+    </div>
+    <div class="card blueprint elev-sm"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div class="card-kicker">{{ t.warrantySoon }}</div>
+      <div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1;color:var(--status-repair)">{{ stats.warrantySoonCount }}</div>
+      <div class="card-meta">{{ t.warrantySoonDesc }}</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:20px">
+    <div class="card blueprint elev-sm" style="padding:0"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="padding:14px 16px 4px;display:flex;align-items:center;justify-content:space-between">
+        <h3 style="font-size:16px;margin:0">{{ t.warrantyNearTitle }}</h3>
+        <button type="button" class="btn btn-ghost" style="font-size:12px;padding:0" onclick="{{ goList }}">{{ t.viewAll }}</button>
+      </div>
+      <table class="table" style="margin-top:4px">
+        <thead><tr><th>{{ t.colAsset }}</th><th>{{ t.colAssignedTo }}</th><th>{{ t.colLocation }}</th><th>{{ t.colWarrantyEnd }}</th></tr></thead>
+        <tbody>
+          <sc-for list="{{ warrantySoonRows }}" as="wrow" hint-placeholder-count="5">
+            <tr class="wdi-row" onclick="{{ wrow.onClick }}">
+              <td>
+                <div style="font-weight:500">{{ wrow.tag }}</div>
+                <div style="font-size:11px;color:color-mix(in srgb, var(--color-text) 55%, transparent)">{{ wrow.brandModel }}</div>
+              </td>
+              <td>{{ wrow.assignedTo }}</td>
+              <td>{{ wrow.location }}</td>
+              <td style="color:var(--status-repair);font-weight:500">{{ wrow.warrantyEnd }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card blueprint elev-sm" style="padding:0"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="padding:14px 16px 4px">
+        <h3 style="font-size:16px;margin:0">{{ t.recentActivity }}</h3>
+      </div>
+      <table class="table" style="margin-top:4px">
+        <thead><tr><th>{{ t.colAsset }}</th><th>{{ t.colAction }}</th><th>{{ t.colBy }}</th><th>{{ t.colWhen }}</th></tr></thead>
+        <tbody>
+          <sc-for list="{{ recentActivityRows }}" as="arow" hint-placeholder-count="5">
+            <tr>
+              <td style="font-weight:500">{{ arow.tag }}</td>
+              <td>{{ arow.action }}</td>
+              <td>{{ arow.by }}</td>
+              <td style="color:color-mix(in srgb, var(--color-text) 55%, transparent)">{{ arow.when }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="margin-top:28px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <h2 style="font-size:18px;margin:0">{{ t.workLogSummaryTitle }}</h2>
+      <button type="button" class="btn btn-ghost" onclick="{{ goWorklog }}">{{ t.viewAll }}</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px">
+      <div class="card blueprint elev-sm"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div class="card-kicker">{{ t.logsThisWeek }}</div>
+        <div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1">{{ logStats.week }}</div>
+      </div>
+      <div class="card blueprint elev-sm"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div class="card-kicker">{{ t.logsThisMonth }}</div>
+        <div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1">{{ logStats.month }}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+      <div class="card blueprint elev-sm"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div class="card-kicker">{{ t.byCategoryTitle }}</div>
+        <div style="display:flex;flex-direction:column;gap:9px;margin-top:10px">
+          <sc-for list="{{ categoryChartRows }}" as="crow" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="width:82px;font-size:12px;flex:none">{{ crow.category }}</span>
+              <div style="flex:1;height:9px;background:var(--color-neutral-100);position:relative">
+                <div style="height:100%;background:var(--color-accent);width:{{ crow.pct }}"></div>
+              </div>
+              <span style="width:20px;font-size:12px;text-align:right;flex:none">{{ crow.count }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div class="card blueprint elev-sm"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div class="card-kicker">{{ t.heatmapTitle }}</div>
+        <div style="display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,11px);gap:3px;margin-top:12px">
+          <sc-for list="{{ heatmapCells }}" as="cell" hint-placeholder-count="91">
+            <div title="{{ cell.tooltip }}" style="width:11px;height:11px;background:{{ cell.color }}"></div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <div class="card blueprint elev-sm" style="padding:0"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="padding:14px 16px 4px">
+        <h3 style="font-size:16px;margin:0">{{ t.recentLogsTitle }}</h3>
+      </div>
+      <table class="table" style="margin-top:4px">
+        <thead><tr><th>{{ t.colLogDate }}</th><th>{{ t.colTitle }}</th><th>{{ t.colCategory }}</th><th>{{ t.colStatus }}</th></tr></thead>
+        <tbody>
+          <sc-for list="{{ recentLogsRows }}" as="rlog" hint-placeholder-count="5">
+            <tr class="wdi-row" onclick="{{ rlog.onClick }}">
+              <td style="color:color-mix(in srgb, var(--color-text) 60%, transparent);white-space:nowrap">{{ rlog.dateDisplay }}</td>
+              <td style="font-weight:500">{{ rlog.title }}</td>
+              <td><span class="tag {{ rlog.categoryClass }}">{{ rlog.category }}</span></td>
+              <td><span class="status-badge" style="{{ rlog.statusStyle }}">{{ rlog.status }}</span></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+<div>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px">
+    <div>
+      <h1 style="font-size:26px;margin-bottom:2px">{{ t.assets }}</h1>
+      <p style="margin:0;font-size:13px;color:color-mix(in srgb, var(--color-text) 60%, transparent)">{{ filteredCountLabel }}</p>
+    </div>
+    <div style="display:flex;gap:10px">
+      <input type="file" id="wdi-import-input" accept=".csv" style="display:none" onchange="{{ handleImportFile }}"></input>
+      <button type="button" class="btn btn-secondary blueprint" onclick="{{ triggerImport }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        {{ t.importCsv }}
+      </button>
+      <button type="button" class="btn btn-secondary blueprint" onclick="{{ exportCSV }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        {{ t.exportCsv }}
+      </button>
+      <button type="button" class="btn btn-primary blueprint" onclick="{{ openAdd }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        {{ t.addAsset }}
+      </button>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <div style="position:relative;flex:1;min-width:240px;max-width:340px">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.55"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input class="input" style="padding-left:32px" placeholder="{{ t.searchPlaceholder }}" value="{{ search }}" oninput="{{ updateSearch }}"></input>
+    </div>
+    <select class="input" style="width:150px" value="{{ filterType }}" onchange="{{ updateFilterType }}">
+      <option value="">{{ t.allType }}</option>
+      <sc-for list="{{ typeOptions }}" as="ty" hint-placeholder-count="10"><option value="{{ ty }}">{{ ty }}</option></sc-for>
+    </select>
+    <select class="input" style="width:150px" value="{{ filterStatus }}" onchange="{{ updateFilterStatus }}">
+      <option value="">{{ t.allStatus }}</option>
+      <sc-for list="{{ statusOptions }}" as="s" hint-placeholder-count="4"><option value="{{ s }}">{{ s }}</option></sc-for>
+    </select>
+    <select class="input" style="width:170px" value="{{ filterLocation }}" onchange="{{ updateFilterLocation }}">
+      <option value="">{{ t.allLocation }}</option>
+      <sc-for list="{{ locationOptions }}" as="l" hint-placeholder-count="8"><option value="{{ l }}">{{ l }}</option></sc-for>
+    </select>
+    <sc-if value="{{ hasFilters }}" hint-placeholder-val="{{ false }}">
+      <button type="button" class="btn btn-ghost" onclick="{{ clearFilters }}">{{ t.clearFilters }}</button>
+    </sc-if>
+  </div>
+
+  <div class="card blueprint elev-sm" style="padding:0"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div class="wdi-scroll" style="overflow-x:auto">
+    <table class="table" style="min-width:1100px">
+      <thead><tr>
+        <th>{{ t.colAssetTag }}</th><th>{{ t.colType }}</th><th>{{ t.colBrandModel }}</th><th>{{ t.colSerial }}</th><th>{{ t.colStatus }}</th><th>{{ t.colAssignedTo }}</th><th>{{ t.colLocation }}</th><th>{{ t.colWarrantyEnd }}</th>
+      </tr></thead>
+      <tbody>
+        <sc-for list="{{ pageRows }}" as="row" hint-placeholder-count="10">
+          <tr class="wdi-row" onclick="{{ row.onClick }}">
+            <td style="font-weight:500">{{ row.tag }}</td>
+            <td>{{ row.type }}</td>
+            <td>{{ row.brandModel }}</td>
+            <td style="color:color-mix(in srgb, var(--color-text) 65%, transparent)">{{ row.serial }}</td>
+            <td><span class="status-badge" style="{{ row.statusStyle }}">{{ row.status }}</span></td>
+            <td>{{ row.assignedTo }}</td>
+            <td>{{ row.location }}</td>
+            <td>{{ row.warrantyEnd }}</td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--color-divider)">
+      <span style="font-size:12px;color:color-mix(in srgb, var(--color-text) 60%, transparent)">{{ pageInfoLabel }}</span>
+      <div style="display:flex;gap:6px">
+        <button type="button" class="btn btn-secondary btn-icon blueprint" onclick="{{ prevPage }}" disabled="{{ isFirstPage }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+        </button>
+        <button type="button" class="btn btn-secondary btn-icon blueprint" onclick="{{ nextPage }}" disabled="{{ isLastPage }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isWorklog }}" hint-placeholder-val="{{ false }}">
+<div>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px">
+    <div>
+      <h1 style="font-size:26px;margin-bottom:2px">{{ t.workLog }}</h1>
+      <p style="margin:0;font-size:13px;color:color-mix(in srgb, var(--color-text) 60%, transparent)">{{ t.workLogSubtitle }}</p>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button type="button" class="btn btn-secondary blueprint" onclick="{{ exportLogsCSV }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ t.exportCsv }}</button>
+      <button type="button" class="btn btn-secondary blueprint" onclick="{{ exportLogsMarkdown }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ t.exportMd }}</button>
+      <button type="button" class="btn btn-primary blueprint" onclick="{{ openAddLog }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        {{ t.addLog }}
+      </button>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <div style="position:relative;flex:1;min-width:220px;max-width:320px">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.55"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input class="input" style="padding-left:32px" placeholder="{{ t.logSearchPlaceholder }}" value="{{ logSearch }}" oninput="{{ updateLogSearch }}"></input>
+    </div>
+    <select class="input" style="width:150px" value="{{ filterLogRange }}" onchange="{{ updateFilterLogRange }}">
+      <option value="all">{{ t.rangeAll }}</option>
+      <option value="week">{{ t.rangeWeek }}</option>
+      <option value="month">{{ t.rangeMonth }}</option>
+      <option value="custom">{{ t.rangeCustom }}</option>
+    </select>
+    <sc-if value="{{ isCustomRange }}" hint-placeholder-val="{{ false }}">
+      <input type="date" class="input" style="width:140px" value="{{ customFrom }}" oninput="{{ updateCustomFrom }}"></input>
+      <input type="date" class="input" style="width:140px" value="{{ customTo }}" oninput="{{ updateCustomTo }}"></input>
+    </sc-if>
+    <select class="input" style="width:150px" value="{{ filterLogCategory }}" onchange="{{ updateFilterLogCategory }}">
+      <option value="">{{ t.allCategory }}</option>
+      <sc-for list="{{ categoryOptions }}" as="cat" hint-placeholder-count="6"><option value="{{ cat }}">{{ cat }}</option></sc-for>
+    </select>
+    <select class="input" style="width:150px" value="{{ filterLogStatus }}" onchange="{{ updateFilterLogStatus }}">
+      <option value="">{{ t.allStatus }}</option>
+      <sc-for list="{{ logStatusOptions }}" as="ls" hint-placeholder-count="3"><option value="{{ ls }}">{{ ls }}</option></sc-for>
+    </select>
+    <sc-if value="{{ hasLogFilters }}" hint-placeholder-val="{{ false }}">
+      <button type="button" class="btn btn-ghost" onclick="{{ clearLogFilters }}">{{ t.clearFilters }}</button>
+    </sc-if>
+  </div>
+
+  <sc-for list="{{ logGroups }}" as="grp" hint-placeholder-count="4">
+    <div class="card blueprint elev-sm" style="padding:0;margin-bottom:16px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--color-divider)">
+        <div style="font-family:var(--font-heading);font-weight:600;font-size:15px">{{ grp.dateLabel }}</div>
+        <span class="tag tag-neutral">{{ grp.countLabel }}</span>
+      </div>
+      <table class="table" style="margin:0">
+        <tbody>
+          <sc-for list="{{ grp.entries }}" as="entry" hint-placeholder-count="3">
+            <tr class="wdi-row" onclick="{{ entry.onClick }}">
+              <td style="width:60px;color:color-mix(in srgb, var(--color-text) 60%, transparent)">{{ entry.time }}</td>
+              <td>
+                <div style="font-weight:500">{{ entry.title }}</div>
+                <sc-if value="{{ entry.hasAsset }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:11px;color:color-mix(in srgb, var(--color-text) 55%, transparent)">{{ entry.assetTag }}</div>
+                </sc-if>
+              </td>
+              <td><span class="tag {{ entry.categoryClass }}">{{ entry.category }}</span></td>
+              <td><span class="status-badge" style="{{ entry.statusStyle }}">{{ entry.status }}</span></td>
+              <td style="color:color-mix(in srgb, var(--color-text) 60%, transparent);white-space:nowrap">{{ entry.durationLabel }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </sc-for>
+  <sc-if value="{{ noLogResults }}" hint-placeholder-val="{{ false }}">
+    <div class="card blueprint elev-sm" style="text-align:center;color:color-mix(in srgb, var(--color-text) 55%, transparent);font-size:13px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ t.noLogResults }}</div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+<div>
+  <button type="button" class="btn btn-ghost" style="margin-bottom:10px;padding-left:0" onclick="{{ goList }}">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    {{ t.backToAssets }}
+  </button>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <div>
+      <h1 style="font-size:26px;margin-bottom:2px">{{ draft.tag }}</h1>
+      <span class="status-badge" style="{{ draftStatusStyle }}">{{ draft.status }}</span>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button type="button" class="btn btn-secondary blueprint" onclick="{{ requestDelete }}" style="color:#b23b3b;border-color:#b23b3b"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        {{ t.delete }}
+      </button>
+      <button type="button" class="btn btn-primary blueprint" onclick="{{ saveDraft }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+        {{ t.save }}
+      </button>
+    </div>
+  </div>
+  <sc-if value="{{ savedFlash }}" hint-placeholder-val="{{ false }}">
+    <div style="margin-bottom:16px;padding:8px 12px;border:1px solid var(--status-inuse);color:var(--status-inuse);font-size:13px">{{ t.savedFlashMsg }}</div>
+  </sc-if>
+
+  <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:20px">
+    <div class="card blueprint elev-sm"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div class="card-kicker">{{ t.assetDetails }}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;margin-top:8px">
+        <div class="field"><label>{{ t.fieldTag }}</label><input class="input" value="{{ draft.tag }}" oninput="{{ makeUpdater('tag') }}"></input></div>
+        <div class="field"><label>{{ t.fieldType }}</label>
+          <select class="input" value="{{ draft.type }}" onchange="{{ makeUpdater('type') }}">
+            <sc-for list="{{ typeOptions }}" as="ty" hint-placeholder-count="10"><option value="{{ ty }}">{{ ty }}</option></sc-for>
+          </select>
+        </div>
+        <div class="field"><label>{{ t.fieldBrand }}</label><input class="input" value="{{ draft.brand }}" oninput="{{ makeUpdater('brand') }}"></input></div>
+        <div class="field"><label>{{ t.fieldModel }}</label><input class="input" value="{{ draft.model }}" oninput="{{ makeUpdater('model') }}"></input></div>
+        <div class="field"><label>{{ t.fieldSerial }}</label><input class="input" value="{{ draft.serial }}" oninput="{{ makeUpdater('serial') }}"></input></div>
+        <div class="field"><label>{{ t.fieldStatus }}</label>
+          <select class="input" value="{{ draft.status }}" onchange="{{ makeUpdater('status') }}">
+            <sc-for list="{{ statusOptions }}" as="s" hint-placeholder-count="4"><option value="{{ s }}">{{ s }}</option></sc-for>
+          </select>
+        </div>
+        <div class="field"><label>{{ t.fieldAssignedTo }}</label><input class="input" value="{{ draft.assignedTo }}" oninput="{{ makeUpdater('assignedTo') }}"></input></div>
+        <div class="field"><label>{{ t.fieldLocation }}</label><input class="input" value="{{ draft.location }}" oninput="{{ makeUpdater('location') }}"></input></div>
+        <div class="field"><label>{{ t.fieldPurchaseDate }}</label><input type="date" class="input" value="{{ draft.purchaseDate }}" oninput="{{ makeUpdater('purchaseDate') }}"></input></div>
+        <div class="field"><label>{{ t.fieldWarrantyEnd }}</label><input type="date" class="input" value="{{ draft.warrantyEnd }}" oninput="{{ makeUpdater('warrantyEnd') }}"></input></div>
+      </div>
+      <div class="field" style="margin-top:14px"><label>{{ t.fieldNotes }}</label><textarea class="input" rows="4" oninput="{{ makeUpdater('notes') }}">{{ draft.notes }}</textarea></div>
+    </div>
+
+    <div class="card blueprint elev-sm"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div class="card-kicker">{{ t.timeline }}</div>
+      <div style="margin-top:8px;display:flex;flex-direction:column">
+        <sc-for list="{{ draft.log }}" as="entry" hint-placeholder-count="4">
+          <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--color-divider)">
+            <div style="width:7px;height:7px;border-radius:50%;background:var(--color-accent);margin-top:6px;flex:none"></div>
+            <div style="min-width:0">
+              <div style="font-size:13px;font-weight:500">{{ entry.action }}</div>
+              <div style="font-size:12px;color:color-mix(in srgb, var(--color-text) 60%, transparent)">{{ entry.detail }}</div>
+              <div style="font-size:11px;color:color-mix(in srgb, var(--color-text) 45%, transparent);margin-top:2px">{{ entry.date }} · {{ entry.by }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+<div>
+  <h1 style="font-size:26px;margin-bottom:18px">{{ t.settings }}</h1>
+
+  <div class="seg" style="margin-bottom:20px">
+    <label class="seg-opt"><input type="radio" name="settingsTab" checked="{{ isApprTab }}" onclick="{{ setSettingsTabAppr }}"></input>{{ t.appearance }}</label>
+    <label class="seg-opt"><input type="radio" name="settingsTab" checked="{{ isConfigTab }}" onclick="{{ setSettingsTabConfig }}"></input>{{ t.assetConfig }}</label>
+    <label class="seg-opt"><input type="radio" name="settingsTab" checked="{{ isDataTab }}" onclick="{{ setSettingsTabData }}"></input>{{ t.dataSection }}</label>
+  </div>
+
+  <sc-if value="{{ isApprTab }}" hint-placeholder-val="{{ true }}">
+    <div class="card blueprint elev-sm" style="max-width:480px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div class="card-kicker">{{ t.themeSectionLabel }}</div>
+      <div class="seg" style="margin-top:8px">
+        <label class="seg-opt"><input type="radio" name="themeMode" checked="{{ isThemeLight }}" onclick="{{ setThemeLight }}"></input>{{ t.themeLight }}</label>
+        <label class="seg-opt"><input type="radio" name="themeMode" checked="{{ isThemeDark }}" onclick="{{ setThemeDark }}"></input>{{ t.themeDark }}</label>
+        <label class="seg-opt"><input type="radio" name="themeMode" checked="{{ isThemeSystem }}" onclick="{{ setThemeSystem }}"></input>{{ t.themeSystem }}</label>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isConfigTab }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:16px;max-width:520px">
+      <div class="card blueprint elev-sm"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div class="field"><label>{{ t.assetTagPrefixLabel }}</label><input class="input" value="{{ assetTagPrefix }}" oninput="{{ updateAssetTagPrefix }}"></input></div>
+      </div>
+      <div class="card blueprint elev-sm"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div class="card-kicker">{{ t.locationsLabel }}</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+          <sc-for list="{{ locationsList }}" as="loc" hint-placeholder-count="9">
+            <div style="display:flex;gap:8px">
+              <input class="input" value="{{ loc.value }}" oninput="{{ loc.onInput }}"></input>
+              <button type="button" class="btn btn-secondary btn-icon blueprint" onclick="{{ loc.onRemove }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+          </sc-for>
+          <button type="button" class="btn btn-ghost" style="align-self:flex-start" onclick="{{ addLocationItem }}">{{ t.addLocation }}</button>
+        </div>
+      </div>
+      <div class="card blueprint elev-sm"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div class="card-kicker">{{ t.typesLabel }}</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+          <sc-for list="{{ typesList }}" as="ty2" hint-placeholder-count="10">
+            <div style="display:flex;gap:8px">
+              <input class="input" value="{{ ty2.value }}" oninput="{{ ty2.onInput }}"></input>
+              <button type="button" class="btn btn-secondary btn-icon blueprint" onclick="{{ ty2.onRemove }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+          </sc-for>
+          <button type="button" class="btn btn-ghost" style="align-self:flex-start" onclick="{{ addTypeItem }}">{{ t.addType }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isDataTab }}" hint-placeholder-val="{{ false }}">
+    <div class="card blueprint elev-sm" style="max-width:480px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div class="card-kicker">{{ t.dataSection }}</div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <input type="file" id="wdi-import-input-settings" accept=".csv" style="display:none" onchange="{{ handleImportFile }}"></input>
+        <button type="button" class="btn btn-secondary blueprint" onclick="{{ exportAllCSV }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ t.exportAllData }}</button>
+        <button type="button" class="btn btn-secondary blueprint" onclick="{{ triggerImportSettings }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ t.importFromCsvBtn }}</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+
+</main>
+</div>
+
+<sc-if value="{{ addOpen }}" hint-placeholder-val="{{ false }}">
+<div class="dialog-backdrop" onclick="{{ closeAddIfBackdrop }}" data-theme="{{ theme }}">
+  <div class="dialog blueprint" role="dialog" aria-modal="true" onclick="{{ stopClick }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div class="dialog-title">{{ t.addAssetTitle }}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field"><label>{{ t.fieldTag }}</label><input class="input" placeholder="WDI-NB-021" value="{{ addForm.tag }}" oninput="{{ makeAddUpdater('tag') }}"></input></div>
+      <div class="field"><label>{{ t.fieldType }}</label>
+        <select class="input" value="{{ addForm.type }}" onchange="{{ makeAddUpdater('type') }}">
+          <sc-for list="{{ typeOptions }}" as="ty" hint-placeholder-count="10"><option value="{{ ty }}">{{ ty }}</option></sc-for>
+        </select>
+      </div>
+      <div class="field"><label>{{ t.fieldBrand }}</label><input class="input" value="{{ addForm.brand }}" oninput="{{ makeAddUpdater('brand') }}"></input></div>
+      <div class="field"><label>{{ t.fieldModel }}</label><input class="input" value="{{ addForm.model }}" oninput="{{ makeAddUpdater('model') }}"></input></div>
+      <div class="field"><label>{{ t.fieldSerial }}</label><input class="input" value="{{ addForm.serial }}" oninput="{{ makeAddUpdater('serial') }}"></input></div>
+      <div class="field"><label>{{ t.fieldStatus }}</label>
+        <select class="input" value="{{ addForm.status }}" onchange="{{ makeAddUpdater('status') }}">
+          <sc-for list="{{ statusOptions }}" as="s" hint-placeholder-count="4"><option value="{{ s }}">{{ s }}</option></sc-for>
+        </select>
+      </div>
+      <div class="field"><label>{{ t.fieldAssignedTo }}</label><input class="input" value="{{ addForm.assignedTo }}" oninput="{{ makeAddUpdater('assignedTo') }}"></input></div>
+      <div class="field"><label>{{ t.fieldLocation }}</label><input class="input" value="{{ addForm.location }}" oninput="{{ makeAddUpdater('location') }}"></input></div>
+      <div class="field"><label>{{ t.fieldWarrantyEnd }}</label><input type="date" class="input" value="{{ addForm.warrantyEnd }}" oninput="{{ makeAddUpdater('warrantyEnd') }}"></input></div>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-secondary blueprint" onclick="{{ closeAdd }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ t.cancel }}</button>
+      <button type="button" class="btn btn-primary blueprint" onclick="{{ submitAdd }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ t.addAsset }}</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ logDialogOpen }}" hint-placeholder-val="{{ false }}">
+<div class="dialog-backdrop" onclick="{{ closeLogDialogIfBackdrop }}" data-theme="{{ theme }}">
+  <div class="dialog blueprint" role="dialog" aria-modal="true" onclick="{{ stopClick }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div class="dialog-title">{{ logDialogTitle }}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field"><label>{{ t.fieldLogDate }}</label><input type="date" class="input" value="{{ logForm.date }}" oninput="{{ makeLogUpdater('date') }}"></input></div>
+      <div class="field"><label>{{ t.fieldDuration }}</label><input type="number" min="0" class="input" value="{{ logForm.durationMin }}" oninput="{{ makeLogUpdater('durationMin') }}"></input></div>
+      <div class="field" style="grid-column:1 / -1"><label>{{ t.fieldLogTitle }}</label><input class="input" value="{{ logForm.title }}" oninput="{{ makeLogUpdater('title') }}"></input></div>
+      <div class="field"><label>{{ t.fieldCategory }}</label>
+        <select class="input" value="{{ logForm.category }}" onchange="{{ makeLogUpdater('category') }}">
+          <sc-for list="{{ categoryOptions }}" as="cat" hint-placeholder-count="6"><option value="{{ cat }}">{{ cat }}</option></sc-for>
+        </select>
+      </div>
+      <div class="field"><label>{{ t.fieldLogStatus }}</label>
+        <select class="input" value="{{ logForm.status }}" onchange="{{ makeLogUpdater('status') }}">
+          <sc-for list="{{ logStatusOptions }}" as="ls" hint-placeholder-count="3"><option value="{{ ls }}">{{ ls }}</option></sc-for>
+        </select>
+      </div>
+      <div class="field" style="grid-column:1 / -1"><label>{{ t.fieldRelatedAsset }}</label>
+        <select class="input" value="{{ logForm.assetTag }}" onchange="{{ makeLogUpdater('assetTag') }}">
+          <option value="">{{ t.noneOption }}</option>
+          <sc-for list="{{ assetTagOptions }}" as="atag" hint-placeholder-count="10"><option value="{{ atag }}">{{ atag }}</option></sc-for>
+        </select>
+      </div>
+      <div class="field" style="grid-column:1 / -1"><label>{{ t.fieldDetail }}</label><textarea class="input" rows="3" oninput="{{ makeLogUpdater('detail') }}">{{ logForm.detail }}</textarea></div>
+      <div class="field" style="grid-column:1 / -1"><label>{{ t.fieldTags }}</label><input class="input" placeholder="{{ t.fieldTagsPlaceholder }}" value="{{ logForm.tagsText }}" oninput="{{ makeLogUpdater('tagsText') }}"></input></div>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-secondary blueprint" onclick="{{ closeLogDialog }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ t.cancel }}</button>
+      <button type="button" class="btn btn-primary blueprint" onclick="{{ submitLogForm }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ logDialogSubmitLabel }}</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ deleteConfirmOpen }}" hint-placeholder-val="{{ false }}">
+<div class="dialog-backdrop" data-theme="{{ theme }}">
+  <div class="dialog blueprint" role="dialog" aria-modal="true"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div class="dialog-title">{{ deleteConfirmTitle }}</div>
+    <div class="dialog-body">{{ t.deleteConfirmBody }}</div>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-secondary blueprint" onclick="{{ cancelDelete }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ t.cancel }}</button>
+      <button type="button" class="btn btn-primary blueprint" style="background:#b23b3b;border-color:#b23b3b" onclick="{{ confirmDeleteNow }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ t.delete }}</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+function pad(n){return n<10?'0'+n:''+n}
+function fmtDate(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function fmtDisplay(iso){if(!iso)return'';var p=iso.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+
+var TYPE_OPTIONS=['Laptop','Desktop','Monitor','Printer','Switch','Router','Firewall','UPS','Phone','Other'];
+var STATUS_OPTIONS=['In Use','In Stock','Repair','Disposed'];
+var LOCATIONS=['Office 2F','Office 3F','Production Line 1','Production Line 2','Production Line 3','Warehouse','Server Room','QC Lab','IT Store Room'];
+
+var SEED_ASSETS=[
+{id:1,tag:'WDI-NB-001',type:'Laptop',brand:'Dell',model:'Latitude 5440',serial:'DL5440-8827',status:'In Use',assignedTo:'สมชาย ใจดี',location:'Office 2F',purchaseDate:'2023-02-10',warrantyEnd:'2026-02-10',notes:'เครื่องหลักของฝ่ายผลิต',log:[{date:'2023-02-12',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'},{date:'2023-02-15',action:'Assigned',detail:'มอบให้ สมชาย ใจดี',by:'Nattapong T.'}]},
+{id:2,tag:'WDI-NB-002',type:'Laptop',brand:'Lenovo',model:'ThinkPad T14',serial:'LT14-3391',status:'In Use',assignedTo:'วิภาวรรณ ศรีสุข',location:'Office 3F',purchaseDate:'2023-05-20',warrantyEnd:'2026-08-20',notes:'',log:[{date:'2023-05-22',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:3,tag:'WDI-NB-003',type:'Laptop',brand:'HP',model:'ProBook 450',serial:'HP450-1120',status:'Repair',assignedTo:'ธนกร พงษ์ไพร',location:'Production Line 1',purchaseDate:'2022-11-02',warrantyEnd:'2025-11-02',notes:'จอแตก ส่งซ่อมที่ศูนย์บริการ',log:[{date:'2022-11-04',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'},{date:'2026-07-30',action:'Status changed',detail:'In Use → Repair (จอแตก)',by:'Nattapong T.'}]},
+{id:4,tag:'WDI-DT-001',type:'Desktop',brand:'Dell',model:'OptiPlex 7010',serial:'DOP7010-552',status:'In Use',assignedTo:'กัญญารัตน์ แสงทอง',location:'Office 2F',purchaseDate:'2021-09-15',warrantyEnd:'2024-09-15',notes:'',log:[{date:'2021-09-17',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:5,tag:'WDI-DT-002',type:'Desktop',brand:'HP',model:'EliteDesk 800',serial:'HED800-7742',status:'In Stock',assignedTo:'',location:'IT Store Room',purchaseDate:'2024-01-08',warrantyEnd:'2027-01-08',notes:'สำรองไว้สำหรับพนักงานใหม่',log:[{date:'2024-01-10',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:6,tag:'WDI-MN-001',type:'Monitor',brand:'Dell',model:'P2422H',serial:'DP2422-9012',status:'In Use',assignedTo:'ปิยะพงษ์ เรืองรุ่ง',location:'Production Line 2',purchaseDate:'2023-03-01',warrantyEnd:'2026-09-05',notes:'',log:[{date:'2023-03-03',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:7,tag:'WDI-MN-002',type:'Monitor',brand:'LG',model:'24MP400',serial:'LG24M-4478',status:'In Stock',assignedTo:'',location:'Warehouse',purchaseDate:'2022-06-12',warrantyEnd:'2025-06-12',notes:'',log:[{date:'2022-06-14',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:8,tag:'WDI-PR-001',type:'Printer',brand:'HP',model:'LaserJet Pro M404',serial:'HPM404-2298',status:'In Use',assignedTo:'',location:'Office 2F',purchaseDate:'2022-08-19',warrantyEnd:'2025-08-19',notes:'ปริ้นเตอร์กลางแผนกธุรการ',log:[{date:'2022-08-21',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:9,tag:'WDI-PR-002',type:'Printer',brand:'Canon',model:'imageCLASS MF264dw',serial:'CN264-5561',status:'Repair',assignedTo:'',location:'Office 3F',purchaseDate:'2021-12-01',warrantyEnd:'2024-12-01',notes:'ลูกกลิ้งดึงกระดาษเสีย',log:[{date:'2021-12-03',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'},{date:'2026-08-05',action:'Status changed',detail:'In Use → Repair (ลูกกลิ้งเสีย)',by:'Nattapong T.'}]},
+{id:10,tag:'WDI-SW-001',type:'Switch',brand:'Cisco',model:'Catalyst 2960',serial:'CC2960-0091',status:'In Use',assignedTo:'',location:'Server Room',purchaseDate:'2022-04-10',warrantyEnd:'2026-10-02',notes:'Core switch โซนผลิต',log:[{date:'2022-04-12',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:11,tag:'WDI-SW-002',type:'Switch',brand:'TP-Link',model:'TL-SG1024',serial:'TP1024-3387',status:'In Use',assignedTo:'',location:'Production Line 3',purchaseDate:'2023-07-01',warrantyEnd:'2026-07-01',notes:'',log:[{date:'2023-07-03',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:12,tag:'WDI-RT-001',type:'Router',brand:'Cisco',model:'RV340',serial:'CRV340-1187',status:'In Use',assignedTo:'',location:'Server Room',purchaseDate:'2023-01-15',warrantyEnd:'2026-10-25',notes:'',log:[{date:'2023-01-17',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:13,tag:'WDI-RT-002',type:'Router',brand:'MikroTik',model:'hEX',serial:'MTHEX-6634',status:'In Stock',assignedTo:'',location:'IT Store Room',purchaseDate:'2024-02-20',warrantyEnd:'2027-02-20',notes:'',log:[{date:'2024-02-22',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:14,tag:'WDI-FW-001',type:'Firewall',brand:'Fortinet',model:'FortiGate 60F',serial:'FG60F-4471',status:'In Use',assignedTo:'',location:'Server Room',purchaseDate:'2023-06-05',warrantyEnd:'2026-11-08',notes:'Perimeter firewall หลัก',log:[{date:'2023-06-07',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:15,tag:'WDI-UPS-001',type:'UPS',brand:'APC',model:'Smart-UPS 1500',serial:'APC1500-2209',status:'In Use',assignedTo:'',location:'Server Room',purchaseDate:'2021-10-10',warrantyEnd:'2024-10-10',notes:'สำรองไฟตู้ Server หลัก',log:[{date:'2021-10-12',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:16,tag:'WDI-UPS-002',type:'UPS',brand:'Eaton',model:'5E 1100',serial:'EA1100-7743',status:'In Stock',assignedTo:'',location:'Warehouse',purchaseDate:'2024-03-18',warrantyEnd:'2027-03-18',notes:'',log:[{date:'2024-03-20',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:17,tag:'WDI-PH-001',type:'Phone',brand:'Apple',model:'iPhone SE',serial:'APSE-9021',status:'In Use',assignedTo:'นภัสกร วงศ์ษา',location:'Office 2F',purchaseDate:'2023-09-01',warrantyEnd:'2025-09-01',notes:'',log:[{date:'2023-09-03',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:18,tag:'WDI-PH-002',type:'Phone',brand:'Samsung',model:'Galaxy A54',serial:'SGA54-1256',status:'In Use',assignedTo:'อรุณี ชัยมงคล',location:'QC Lab',purchaseDate:'2023-11-11',warrantyEnd:'2025-11-11',notes:'',log:[{date:'2023-11-13',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:19,tag:'WDI-OT-001',type:'Other',brand:'Zebra',model:'DS2208 Barcode Scanner',serial:'ZDS2208-771',status:'In Use',assignedTo:'วีรยุทธ บุญมา',location:'Warehouse',purchaseDate:'2022-05-05',warrantyEnd:'2025-05-05',notes:'',log:[{date:'2022-05-07',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:20,tag:'WDI-OT-002',type:'Other',brand:'Brother',model:'QL-820NWB Label Printer',serial:'BQL820-4482',status:'In Stock',assignedTo:'',location:'IT Store Room',purchaseDate:'2023-08-08',warrantyEnd:'2025-08-08',notes:'',log:[{date:'2023-08-10',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:21,tag:'WDI-DT-003',type:'Desktop',brand:'Dell',model:'OptiPlex 7010',serial:'DOP7010-991',status:'Disposed',assignedTo:'',location:'Warehouse',purchaseDate:'2018-04-01',warrantyEnd:'2021-04-01',notes:'ปลดระวางแล้ว เตรียมทำลาย',log:[{date:'2018-04-03',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'},{date:'2026-06-01',action:'Status changed',detail:'In Use → Disposed (หมดอายุการใช้งาน)',by:'Nattapong T.'}]},
+{id:22,tag:'WDI-NB-004',type:'Laptop',brand:'Dell',model:'Latitude 5440',serial:'DL5440-1145',status:'In Use',assignedTo:'สุดารัตน์ ทองดี',location:'Production Line 2',purchaseDate:'2023-10-01',warrantyEnd:'2026-10-01',notes:'',log:[{date:'2023-10-03',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:23,tag:'WDI-MN-003',type:'Monitor',brand:'LG',model:'24MP400',serial:'LG24M-8890',status:'In Use',assignedTo:'ประเสริฐ คำแก้ว',location:'Production Line 1',purchaseDate:'2023-04-14',warrantyEnd:'2026-04-14',notes:'',log:[{date:'2023-04-16',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]},
+{id:24,tag:'WDI-SW-003',type:'Switch',brand:'Cisco',model:'Catalyst 2960',serial:'CC2960-5523',status:'In Use',assignedTo:'',location:'Production Line 3',purchaseDate:'2022-09-09',warrantyEnd:'2025-09-09',notes:'',log:[{date:'2022-09-11',action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]}
+];
+
+var RECENT_ACTIVITY=[
+{tag:'WDI-PR-002',action:'Status → Repair',by:'Nattapong T.',when:'13/08/2026'},
+{tag:'WDI-NB-003',action:'Status → Repair',by:'Nattapong T.',when:'30/07/2026'},
+{tag:'WDI-DT-003',action:'Status → Disposed',by:'Nattapong T.',when:'01/06/2026'},
+{tag:'WDI-OT-002',action:'Created',by:'Nattapong T.',when:'08/08/2023'},
+{tag:'WDI-PH-002',action:'Assigned → อรุณี ชัยมงคล',by:'Nattapong T.',when:'13/11/2023'}
+];
+
+var TODAY=new Date('2026-08-13');
+
+var CATEGORY_OPTIONS=['Incident','Maintenance','Project','Procurement','Meeting','Other'];
+var LOG_STATUS_OPTIONS=['Done','In Progress','Blocked'];
+
+var WORK_LOGS=[
+{id:1,date:'2026-06-20',time:'09:15',title:'ติดตั้ง notebook ใหม่ให้ฝ่ายบัญชี',category:'Project',status:'Done',durationMin:45,assetTag:'WDI-NB-004',detail:'ติดตั้งเครื่องและย้ายข้อมูลจากเครื่องเก่า',tags:['onboarding']},
+{id:2,date:'2026-06-22',time:'14:00',title:'ตรวจสอบ UPS ห้อง Server ประจำเดือน',category:'Maintenance',status:'Done',durationMin:30,assetTag:'WDI-UPS-001',detail:'ตรวจสอบแบตเตอรี่และรอบสำรองไฟ ปกติดี',tags:['ups']},
+{id:3,date:'2026-06-25',time:'10:30',title:'เปลี่ยน SFP module core switch port 1/0/12',category:'Incident',status:'Done',durationMin:60,assetTag:'WDI-SW-001',detail:'พอร์ตหลุดเป็นระยะ เปลี่ยน SFP ใหม่แก้ไขได้',tags:['network']},
+{id:4,date:'2026-06-25',time:'15:00',title:'ตั้งค่า VLAN 30 ให้ไลน์ผลิต 2',category:'Project',status:'Done',durationMin:90,assetTag:'WDI-SW-002',detail:'แยก VLAN สำหรับเครื่องจักร PLC โซนผลิต 2',tags:['vlan']},
+{id:5,date:'2026-06-29',time:'11:00',title:'ประชุมกับ vendor เรื่องระบบ PA',category:'Meeting',status:'Done',durationMin:60,assetTag:'',detail:'คุยสเปคลำโพงและตู้คอนโทรลใหม่',tags:[]},
+{id:6,date:'2026-07-02',time:'09:00',title:'เช็ค Printer แผนกธุรการ กระดาษติดบ่อย',category:'Maintenance',status:'Done',durationMin:20,assetTag:'WDI-PR-001',detail:'ทำความสะอาดลูกกลิ้งดึงกระดาษ',tags:['printer']},
+{id:7,date:'2026-07-03',time:'13:20',title:'สั่งซื้อ Monitor เพิ่ม 5 เครื่อง สำหรับ Line 2',category:'Procurement',status:'In Progress',durationMin:0,assetTag:'',detail:'รอใบเสนอราคาจากร้านค้า',tags:['po']},
+{id:8,date:'2026-07-06',time:'09:40',title:'เพิ่ม Firewall rule สำหรับระบบ ERP',category:'Project',status:'Done',durationMin:75,assetTag:'WDI-FW-001',detail:'เปิดพอร์ตสำหรับเซิร์ฟเวอร์ ERP ตัวใหม่',tags:['firewall']},
+{id:9,date:'2026-07-08',time:'16:00',title:'ตรวจสอบ Backup Server รายสัปดาห์',category:'Maintenance',status:'Done',durationMin:25,assetTag:'',detail:'Backup สำเร็จปกติ ไม่มี error',tags:['backup']},
+{id:10,date:'2026-07-10',time:'10:00',title:'Laptop จอแตก ส่งเคลมประกัน',category:'Incident',status:'In Progress',durationMin:30,assetTag:'WDI-NB-003',detail:'ติดต่อศูนย์บริการเพื่อเคลมประกัน',tags:[]},
+{id:11,date:'2026-07-13',time:'09:30',title:'ติดตั้ง Access Point เพิ่มโซน QC Lab',category:'Project',status:'Done',durationMin:120,assetTag:'',detail:'สัญญาณ WiFi อ่อนในโซน QC เดินสายและติดตั้งใหม่',tags:['wifi']},
+{id:12,date:'2026-07-15',time:'14:30',title:'Router Server Room รีสตาร์ทเอง ตรวจสอบ Log',category:'Incident',status:'Done',durationMin:40,assetTag:'WDI-RT-001',detail:'พบ log อุณหภูมิสูง ทำความสะอาดพัดลมระบายความร้อน',tags:[]},
+{id:13,date:'2026-07-16',time:'11:00',title:'ประชุมทีม IT วางแผนงบประมาณ Q3',category:'Meeting',status:'Done',durationMin:45,assetTag:'',detail:'สรุปรายการอุปกรณ์ที่ต้องจัดซื้อไตรมาส 3',tags:[]},
+{id:14,date:'2026-07-20',time:'09:00',title:'เปลี่ยนแบตเตอรี่ UPS สำรอง',category:'Maintenance',status:'Blocked',durationMin:0,assetTag:'WDI-UPS-002',detail:'รออะไหล่แบตเตอรี่จาก supplier',tags:['ups']},
+{id:15,date:'2026-07-21',time:'15:40',title:'Barcode Scanner คลังสินค้าอ่านไม่ติด',category:'Incident',status:'Done',durationMin:35,assetTag:'WDI-OT-001',detail:'ทำความสะอาดเลนส์สแกนเนอร์ ใช้งานได้ปกติ',tags:[]},
+{id:16,date:'2026-07-22',time:'10:00',title:'ตรวจสอบ Switch โซนผลิต 3 สาย LAN หลุดบ่อย',category:'Maintenance',status:'Done',durationMin:50,assetTag:'WDI-SW-003',detail:'เปลี่ยนสาย patch cord ที่ชำรุด',tags:['network']},
+{id:17,date:'2026-07-23',time:'13:00',title:'จัดซื้อ Notebook สำรอง 3 เครื่อง',category:'Procurement',status:'Done',durationMin:0,assetTag:'',detail:'อนุมัติ PO และรับเครื่องเข้าคลัง IT',tags:['po']},
+{id:18,date:'2026-07-27',time:'09:20',title:'ติดตั้ง Printer ใหม่ QC Lab',category:'Project',status:'Done',durationMin:40,assetTag:'',detail:'ติดตั้งและเชื่อมต่อเครือข่ายเรียบร้อย',tags:['printer']},
+{id:19,date:'2026-07-28',time:'11:15',title:'ประชุมกับ vendor ระบบ CCTV',category:'Meeting',status:'Done',durationMin:60,assetTag:'',detail:'คุยแผนขยายกล้องวงจรปิดโกดังสินค้า',tags:[]},
+{id:20,date:'2026-07-29',time:'14:00',title:'พื้นที่ Backup Server เต็ม ต้องขยาย',category:'Incident',status:'In Progress',durationMin:90,assetTag:'',detail:'กำลังประเมินตัวเลือกขยาย storage',tags:['backup']},
+{id:21,date:'2026-07-30',time:'10:00',title:'HP ProBook 450 จอแตก เปลี่ยนสถานะเป็น Repair',category:'Incident',status:'Done',durationMin:20,assetTag:'WDI-NB-003',detail:'ส่งเครื่องเข้าศูนย์บริการเรียบร้อย',tags:[]},
+{id:22,date:'2026-08-01',time:'09:00',title:'ตรวจเช็ค Network switch ประจำเดือน',category:'Maintenance',status:'Done',durationMin:60,assetTag:'',detail:'ตรวจสอบ port utilization และ log error',tags:['network']},
+{id:23,date:'2026-08-03',time:'13:30',title:'ตั้งค่า Printer แผนกธุรการใหม่หลังเปลี่ยนเครื่อง',category:'Project',status:'Done',durationMin:30,assetTag:'WDI-PR-001',detail:'ติดตั้ง driver และแชร์เครื่องพิมพ์ในเครือข่าย',tags:['printer']},
+{id:24,date:'2026-08-04',time:'15:00',title:'อัปเดต Firmware Firewall FortiGate',category:'Maintenance',status:'Done',durationMin:45,assetTag:'WDI-FW-001',detail:'อัปเดตเป็นเวอร์ชันล่าสุดตามแพตช์ความปลอดภัย',tags:['firewall']},
+{id:25,date:'2026-08-05',time:'09:30',title:'Canon Printer ลูกกลิ้งดึงกระดาษเสีย เปลี่ยนสถานะ Repair',category:'Incident',status:'Done',durationMin:25,assetTag:'WDI-PR-002',detail:'สั่งอะไหล่ลูกกลิ้งใหม่และนัดช่างเข้าซ่อม',tags:['printer']},
+{id:26,date:'2026-08-06',time:'11:00',title:'ประชุม IT ประจำสัปดาห์',category:'Meeting',status:'Done',durationMin:30,assetTag:'',detail:'ติดตามงานค้างและแผนงานสัปดาห์หน้า',tags:[]},
+{id:27,date:'2026-08-07',time:'09:15',title:'ติดตั้ง Windows Update ทุกเครื่อง Office 2F',category:'Maintenance',status:'Done',durationMin:90,assetTag:'',detail:'ทยอยอัปเดตนอกเวลาทำงานเพื่อไม่กระทบผู้ใช้',tags:[]},
+{id:28,date:'2026-08-10',time:'10:00',title:'ตั้งค่า VLAN ใหม่สำหรับกล้อง CCTV โกดัง',category:'Project',status:'In Progress',durationMin:60,assetTag:'',detail:'แยก VLAN กล้องวงจรปิดออกจากเครือข่ายหลัก',tags:['vlan']},
+{id:29,date:'2026-08-11',time:'14:00',title:'UPS ห้อง Server แจ้งเตือนแบตเสื่อม',category:'Incident',status:'In Progress',durationMin:20,assetTag:'WDI-UPS-001',detail:'สั่งแบตเตอรี่ใหม่ รอเปลี่ยน',tags:['ups']},
+{id:30,date:'2026-08-12',time:'09:00',title:'สำรวจอุปกรณ์คงคลัง IT Store Room',category:'Other',status:'Done',durationMin:40,assetTag:'',detail:'ตรวจนับอุปกรณ์สำรองและปรับปรุงบันทึกคงคลัง',tags:[]},
+{id:31,date:'2026-08-13',time:'08:45',title:'เปลี่ยน SFP module core switch port 1/0/12 (รอบสอง)',category:'Incident',status:'In Progress',durationMin:30,assetTag:'WDI-SW-001',detail:'พอร์ตหลุดซ้ำ กำลังตรวจสอบสาย fiber',tags:['network']},
+{id:32,date:'2026-08-13',time:'11:30',title:'ประชุมกับ vendor เรื่องระบบ PA',category:'Meeting',status:'Done',durationMin:45,assetTag:'',detail:'สรุปสเปคสุดท้ายก่อนออก PO',tags:[]}
+];
+
+var STRINGS={
+  th:{
+    dashboard:'Dashboard',assets:'Assets',itEngineer:'IT Engineer',
+    darkMode:'Dark mode',lightMode:'Light mode',langLabelTh:'ภาษาไทย',langLabelEn:'English',
+    dashboardSubtitle:'ภาพรวมทรัพย์สิน IT ทั้งหมด',
+    totalAssets:'Total assets',totalAssetsDesc:'อุปกรณ์ทั้งหมดในระบบ',
+    inUse:'In use',inUseDesc:'กำลังใช้งานอยู่',
+    inStock:'In stock',inStockDesc:'พร้อมเบิกใช้',
+    warrantySoon:'Warranty หมดใน 90 วัน',warrantySoonDesc:'ควรวางแผนต่ออายุ/จัดซื้อ',
+    warrantyNearTitle:'Warranty ใกล้หมด',viewAll:'ดูทั้งหมด',recentActivity:'Recent activity',
+    colAsset:'Asset',colAssignedTo:'Assigned To',colLocation:'Location',colWarrantyEnd:'Warranty End',
+    colAction:'Action',colBy:'By',colWhen:'When',
+    exportCsv:'Export CSV',importCsv:'Import CSV',addAsset:'Add Asset',
+    searchPlaceholder:'ค้นหา tag, serial, ชื่อผู้ถือ',
+    allType:'ทุก Type',allStatus:'ทุก Status',allLocation:'ทุก Location',clearFilters:'ล้างตัวกรอง',
+    colAssetTag:'Asset Tag',colType:'Type',colBrandModel:'Brand / Model',colSerial:'Serial',colStatus:'Status',
+    backToAssets:'กลับไป Assets',delete:'Delete',save:'Save',savedFlashMsg:'บันทึกข้อมูลแล้ว',
+    assetDetails:'รายละเอียดทรัพย์สิน',timeline:'Timeline',
+    fieldTag:'Asset Tag',fieldType:'Type',fieldBrand:'Brand',fieldModel:'Model',fieldSerial:'Serial',
+    fieldStatus:'Status',fieldAssignedTo:'Assigned To',fieldLocation:'Location',fieldPurchaseDate:'Purchase Date',
+    fieldWarrantyEnd:'Warranty End',fieldNotes:'Notes',
+    addAssetTitle:'Add Asset',cancel:'Cancel',
+    deleteConfirmBody:'การลบไม่สามารถย้อนกลับได้ ทรัพย์สินนี้จะถูกลบออกจากระบบทั้งหมด',
+    deleteConfirmTitle:function(tag){return 'ลบ '+tag+' ?';},
+    itemsCount:function(n,total){return n+' รายการ จากทั้งหมด '+total;},
+    pageInfo:function(from,to,total,page,pages){return 'แสดง '+from+'–'+to+' จาก '+total+' · หน้า '+page+'/'+pages;},
+    settings:'Settings',
+    appearance:'Appearance',themeSectionLabel:'Theme',themeLight:'Light',themeDark:'Dark',themeSystem:'System',
+    assetConfig:'Asset Configuration',assetTagPrefixLabel:'Asset Tag Prefix',
+    locationsLabel:'Location list',typesLabel:'Asset Type list',
+    addLocation:'+ เพิ่ม Location',addType:'+ เพิ่ม Type',
+    dataSection:'Data',exportAllData:'Export All Data (CSV)',importFromCsvBtn:'Import from CSV',
+    workLog:'Work Log',workLogSubtitle:'บันทึกงานประจำวันของทีม IT',addLog:'Add Log',exportMd:'Export Markdown',
+    logSearchPlaceholder:'ค้นหา title, รายละเอียด',
+    rangeAll:'ทั้งหมด',rangeWeek:'สัปดาห์นี้',rangeMonth:'เดือนนี้',rangeCustom:'ช่วงวันที่กำหนดเอง',
+    allCategory:'ทุก Category',colLogDate:'วันที่',colTitle:'Title',colCategory:'Category',
+    noLogResults:'ไม่พบบันทึกงานที่ตรงกับตัวกรอง',
+    fieldLogDate:'Date',fieldLogTitle:'Title',fieldCategory:'Category',fieldLogStatus:'Status',
+    fieldDuration:'Duration (นาที)',fieldRelatedAsset:'Related Asset',fieldDetail:'Detail',fieldTags:'Tags',
+    fieldTagsPlaceholder:'เช่น network, ups',noneOption:'— ไม่มี —',
+    addLogTitle:'Add Log',editLogTitle:'Edit Log',
+    workLogSummaryTitle:'Work Log Summary',logsThisWeek:'งานสัปดาห์นี้',logsThisMonth:'งานเดือนนี้',
+    byCategoryTitle:'จำนวนงานแยกตาม Category (30 วันล่าสุด)',heatmapTitle:'ความถี่การบันทึกงาน',
+    recentLogsTitle:'บันทึกล่าสุด',minShort:'นาที'
+  },
+  en:{
+    dashboard:'Dashboard',assets:'Assets',itEngineer:'IT Engineer',
+    darkMode:'Dark mode',lightMode:'Light mode',langLabelTh:'Thai',langLabelEn:'English',
+    dashboardSubtitle:'Overview of all IT assets',
+    totalAssets:'Total assets',totalAssetsDesc:'All assets in the system',
+    inUse:'In use',inUseDesc:'Currently deployed',
+    inStock:'In stock',inStockDesc:'Ready to deploy',
+    warrantySoon:'Warranty due in 90 days',warrantySoonDesc:'Plan renewal or replacement',
+    warrantyNearTitle:'Warranty ending soon',viewAll:'View all',recentActivity:'Recent activity',
+    colAsset:'Asset',colAssignedTo:'Assigned To',colLocation:'Location',colWarrantyEnd:'Warranty End',
+    colAction:'Action',colBy:'By',colWhen:'When',
+    exportCsv:'Export CSV',importCsv:'Import CSV',addAsset:'Add Asset',
+    searchPlaceholder:'Search tag, serial, holder name',
+    allType:'All Types',allStatus:'All Statuses',allLocation:'All Locations',clearFilters:'Clear filters',
+    colAssetTag:'Asset Tag',colType:'Type',colBrandModel:'Brand / Model',colSerial:'Serial',colStatus:'Status',
+    backToAssets:'Back to Assets',delete:'Delete',save:'Save',savedFlashMsg:'Saved successfully',
+    assetDetails:'Asset details',timeline:'Timeline',
+    fieldTag:'Asset Tag',fieldType:'Type',fieldBrand:'Brand',fieldModel:'Model',fieldSerial:'Serial',
+    fieldStatus:'Status',fieldAssignedTo:'Assigned To',fieldLocation:'Location',fieldPurchaseDate:'Purchase Date',
+    fieldWarrantyEnd:'Warranty End',fieldNotes:'Notes',
+    addAssetTitle:'Add Asset',cancel:'Cancel',
+    deleteConfirmBody:'This cannot be undone. This asset will be permanently removed from the system.',
+    deleteConfirmTitle:function(tag){return 'Delete '+tag+'?';},
+    itemsCount:function(n,total){return n+' of '+total+' assets';},
+    pageInfo:function(from,to,total,page,pages){return 'Showing '+from+'–'+to+' of '+total+' · page '+page+'/'+pages;},
+    settings:'Settings',
+    appearance:'Appearance',themeSectionLabel:'Theme',themeLight:'Light',themeDark:'Dark',themeSystem:'System',
+    assetConfig:'Asset Configuration',assetTagPrefixLabel:'Asset Tag Prefix',
+    locationsLabel:'Location list',typesLabel:'Asset Type list',
+    addLocation:'+ Add location',addType:'+ Add type',
+    dataSection:'Data',exportAllData:'Export All Data (CSV)',importFromCsvBtn:'Import from CSV',
+    workLog:'Work Log',workLogSubtitle:'Daily work log for the IT team',addLog:'Add Log',exportMd:'Export Markdown',
+    logSearchPlaceholder:'Search title, detail',
+    rangeAll:'All time',rangeWeek:'This week',rangeMonth:'This month',rangeCustom:'Custom range',
+    allCategory:'All Categories',colLogDate:'Date',colTitle:'Title',colCategory:'Category',
+    noLogResults:'No logs match the current filters',
+    fieldLogDate:'Date',fieldLogTitle:'Title',fieldCategory:'Category',fieldLogStatus:'Status',
+    fieldDuration:'Duration (min)',fieldRelatedAsset:'Related Asset',fieldDetail:'Detail',fieldTags:'Tags',
+    fieldTagsPlaceholder:'e.g. network, ups',noneOption:'— None —',
+    addLogTitle:'Add Log',editLogTitle:'Edit Log',
+    workLogSummaryTitle:'Work Log Summary',logsThisWeek:'Logs this week',logsThisMonth:'Logs this month',
+    byCategoryTitle:'Logs by category (last 30 days)',heatmapTitle:'Logging frequency',
+    recentLogsTitle:'Recent logs',minShort:'min'
+  }
+};
+
+function logStatusVar(s){
+  return s==='Done'?'var(--status-inuse)':s==='In Progress'?'var(--status-instock)':'var(--status-repair)';
+}
+function logStatusStyle(s){
+  var c=logStatusVar(s);
+  return 'color:'+c+';border-color:'+c+';background:color-mix(in srgb, '+c+' 10%, transparent)';
+}
+var CATEGORY_TAG_CLASS={Incident:'tag-accent',Maintenance:'tag-neutral',Project:'tag-accent-2',Procurement:'tag-outline',Meeting:'tag-accent',Other:'tag-neutral'};
+function categoryTagClass(cat){return CATEGORY_TAG_CLASS[cat]||'tag-neutral';}
+function startOfWeek(d){var x=new Date(d);var day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);return x;}
+function startOfMonth(d){return new Date(d.getFullYear(),d.getMonth(),1);}
+
+function statusVar(s){
+  return s==='In Use'?'var(--status-inuse)':s==='In Stock'?'var(--status-instock)':s==='Repair'?'var(--status-repair)':'var(--status-disposed)';
+}
+function statusStyle(s){
+  var c=statusVar(s);
+  return 'color:'+c+';border-color:'+c+';background:color-mix(in srgb, '+c+' 10%, transparent)';
+}
+
+class Component extends DCLogic {
+  state={
+    themeMode:'light', lang:'th', view:'dashboard', selectedId:null,
+    search:'', filterType:'', filterStatus:'', filterLocation:'',
+    page:1, pageSize:10,
+    assets:SEED_ASSETS.slice(),
+    addOpen:false,
+    addForm:{tag:'',type:'Laptop',brand:'',model:'',serial:'',status:'In Stock',assignedTo:'',location:'',warrantyEnd:''},
+    draft:null,
+    deleteConfirmOpen:false,
+    savedFlash:false,
+    settingsTab:'appearance',
+    assetTagPrefix:'WDI-',
+    locationsList:LOCATIONS.slice(),
+    typesList:TYPE_OPTIONS.slice(),
+    workLogs:WORK_LOGS.slice(),
+    logSearch:'', filterLogCategory:'', filterLogStatus:'', filterLogRange:'all', customFrom:'', customTo:'',
+    logDialogOpen:false, editingLogId:null,
+    logForm:{date:fmtDate(TODAY),title:'',category:'Incident',status:'Done',durationMin:'',assetTag:'',detail:'',tagsText:''}
+  };
+
+  componentDidMount(){
+    try{
+      var t=localStorage.getItem('wdi-asset-theme');
+      if(t==='dark'||t==='light'||t==='system') this.setState({themeMode:t});
+      var l=localStorage.getItem('wdi-asset-lang');
+      if(l==='th'||l==='en') this.setState({lang:l});
+    }catch(e){}
+  }
+
+  _appliedTheme(themeMode){
+    if(themeMode==='system'){
+      try{ return window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; }catch(e){ return 'light'; }
+    }
+    return themeMode;
+  }
+
+  setThemeMode=(mode)=>{
+    this.setState({themeMode:mode});
+    try{localStorage.setItem('wdi-asset-theme',mode)}catch(e){}
+  };
+
+  goSettings=()=>this.setState({view:'settings'});
+  setSettingsTab=(tab)=>this.setState({settingsTab:tab});
+  updateAssetTagPrefix=(e)=>this.setState({assetTagPrefix:e.target.value});
+
+  addLocationItem=()=>this.setState(s=>({locationsList:s.locationsList.concat([''])}));
+  updateLocationItem=(idx)=>(e)=>{var v=e.target.value;this.setState(s=>({locationsList:s.locationsList.map((x,i)=>i===idx?v:x)}));};
+  removeLocationItem=(idx)=>this.setState(s=>({locationsList:s.locationsList.filter((x,i)=>i!==idx)}));
+
+  addTypeItem=()=>this.setState(s=>({typesList:s.typesList.concat([''])}));
+  updateTypeItem=(idx)=>(e)=>{var v=e.target.value;this.setState(s=>({typesList:s.typesList.map((x,i)=>i===idx?v:x)}));};
+  removeTypeItem=(idx)=>this.setState(s=>({typesList:s.typesList.filter((x,i)=>i!==idx)}));
+
+  exportAllCSV=()=>{
+    var s=this.state;
+    var header=['Asset Tag','Type','Brand','Model','Serial','Status','Assigned To','Location','Warranty End'];
+    var lines=[header.join(',')];
+    s.assets.forEach(a=>{
+      var vals=[a.tag,a.type,a.brand,a.model,a.serial,a.status,a.assignedTo,a.location,a.warrantyEnd];
+      lines.push(vals.map(v=>'"'+String(v||'').replace(/"/g,'""')+'"').join(','));
+    });
+    var blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.download='wdi-assets-all.csv';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  toggleLang=()=>{
+    var next=this.state.lang==='th'?'en':'th';
+    this.setState({lang:next});
+    try{localStorage.setItem('wdi-asset-lang',next)}catch(e){}
+  };
+
+  toggleTheme=()=>{
+    var applied=this._appliedTheme(this.state.themeMode);
+    var next=applied==='dark'?'light':'dark';
+    this.setState({themeMode:next});
+    try{localStorage.setItem('wdi-asset-theme',next)}catch(e){}
+  };
+
+  goDashboard=()=>this.setState({view:'dashboard'});
+  goList=()=>this.setState({view:'list',selectedId:null,draft:null});
+  goWorklog=()=>this.setState({view:'worklog'});
+  noop=()=>{};
+
+  updateLogSearch=(e)=>this.setState({logSearch:e.target.value});
+  updateFilterLogCategory=(e)=>this.setState({filterLogCategory:e.target.value});
+  updateFilterLogStatus=(e)=>this.setState({filterLogStatus:e.target.value});
+  updateFilterLogRange=(e)=>this.setState({filterLogRange:e.target.value});
+  updateCustomFrom=(e)=>this.setState({customFrom:e.target.value});
+  updateCustomTo=(e)=>this.setState({customTo:e.target.value});
+  clearLogFilters=()=>this.setState({logSearch:'',filterLogCategory:'',filterLogStatus:'',filterLogRange:'all',customFrom:'',customTo:''});
+
+  _filteredLogs(s){
+    var q=s.logSearch.trim().toLowerCase();
+    var from=null,to=null;
+    if(s.filterLogRange==='week'){ from=startOfWeek(TODAY); to=TODAY; }
+    else if(s.filterLogRange==='month'){ from=startOfMonth(TODAY); to=TODAY; }
+    else if(s.filterLogRange==='custom'){ from=s.customFrom?new Date(s.customFrom):null; to=s.customTo?new Date(s.customTo):null; }
+    return s.workLogs.filter(l=>{
+      if(s.filterLogCategory&&l.category!==s.filterLogCategory)return false;
+      if(s.filterLogStatus&&l.status!==s.filterLogStatus)return false;
+      var d=new Date(l.date);
+      if(from&&d<from)return false;
+      if(to&&d>to)return false;
+      if(q){
+        var hay=(l.title+' '+l.detail).toLowerCase();
+        if(hay.indexOf(q)===-1)return false;
+      }
+      return true;
+    }).sort((a,b)=>{
+      if(a.date!==b.date)return a.date<b.date?1:-1;
+      return a.time<b.time?1:-1;
+    });
+  }
+
+  openAddLog=()=>this.setState({logDialogOpen:true,editingLogId:null,logForm:{date:fmtDate(TODAY),title:'',category:'Incident',status:'Done',durationMin:'',assetTag:'',detail:'',tagsText:''}});
+  openEditLog=(id)=>{
+    var l=this.state.workLogs.find(x=>x.id===id);
+    if(!l)return;
+    this.setState({logDialogOpen:true,editingLogId:id,logForm:{date:l.date,title:l.title,category:l.category,status:l.status,durationMin:l.durationMin||'',assetTag:l.assetTag||'',detail:l.detail||'',tagsText:(l.tags||[]).join(', ')}});
+  };
+  closeLogDialog=()=>this.setState({logDialogOpen:false});
+  closeLogDialogIfBackdrop=(e)=>{if(e.target===e.currentTarget)this.setState({logDialogOpen:false});};
+
+  makeLogUpdater=(field)=>(e)=>{
+    var v=e.target.value;
+    this.setState(s=>({logForm:Object.assign({},s.logForm,{[field]:v})}));
+  };
+
+  submitLogForm=()=>{
+    var f=this.state.logForm;
+    if(!f.title.trim())return;
+    var tags=f.tagsText.split(',').map(x=>x.trim()).filter(Boolean);
+    var timeNow=(new Date()).toTimeString().slice(0,5);
+    this.setState(s=>{
+      if(s.editingLogId){
+        return {workLogs:s.workLogs.map(l=>l.id===s.editingLogId?Object.assign({},l,{date:f.date,title:f.title,category:f.category,status:f.status,durationMin:Number(f.durationMin)||0,assetTag:f.assetTag,detail:f.detail,tags:tags}):l),logDialogOpen:false};
+      }
+      var nextId=Math.max.apply(null,s.workLogs.map(l=>l.id).concat([0]))+1;
+      var entry={id:nextId,date:f.date,time:timeNow,title:f.title,category:f.category,status:f.status,durationMin:Number(f.durationMin)||0,assetTag:f.assetTag,detail:f.detail,tags:tags};
+      return {workLogs:[entry].concat(s.workLogs),logDialogOpen:false};
+    });
+  };
+
+  exportLogsCSV=()=>{
+    var rows=this._filteredLogs(this.state);
+    var header=['Date','Time','Title','Category','Status','Duration (min)','Related Asset','Detail','Tags'];
+    var lines=[header.join(',')];
+    rows.forEach(l=>{
+      var vals=[l.date,l.time,l.title,l.category,l.status,l.durationMin,l.assetTag,l.detail,(l.tags||[]).join('; ')];
+      lines.push(vals.map(v=>'"'+String(v||'').replace(/"/g,'""')+'"').join(','));
+    });
+    var blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.download='wdi-work-log.csv';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  exportLogsMarkdown=()=>{
+    var rows=this._filteredLogs(this.state);
+    var byDate={};
+    rows.forEach(l=>{ (byDate[l.date]=byDate[l.date]||[]).push(l); });
+    var dates=Object.keys(byDate).sort().reverse();
+    var lines=['# Work Log',''];
+    dates.forEach(d=>{
+      lines.push('## '+d,'');
+      byDate[d].forEach(l=>{
+        lines.push('- **'+l.time+'** '+l.title+' _(  '+l.category+' · '+l.status+(l.durationMin?' · '+l.durationMin+' min':'')+(l.assetTag?' · '+l.assetTag:'')+')_');
+        if(l.detail)lines.push('  '+l.detail);
+      });
+      lines.push('');
+    });
+    var blob=new Blob([lines.join('\n')],{type:'text/markdown;charset=utf-8;'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.download='wdi-work-log.md';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  selectAsset=(id)=>{
+    var a=this.state.assets.find(x=>x.id===id);
+    if(!a)return;
+    this.setState({view:'detail',selectedId:id,draft:Object.assign({},a,{log:a.log.slice()}),savedFlash:false});
+  };
+
+  updateSearch=(e)=>this.setState({search:e.target.value,page:1});
+  updateFilterType=(e)=>this.setState({filterType:e.target.value,page:1});
+  updateFilterStatus=(e)=>this.setState({filterStatus:e.target.value,page:1});
+  updateFilterLocation=(e)=>this.setState({filterLocation:e.target.value,page:1});
+  clearFilters=()=>this.setState({search:'',filterType:'',filterStatus:'',filterLocation:'',page:1});
+
+  prevPage=()=>this.setState(s=>({page:Math.max(1,s.page-1)}));
+  nextPage=()=>this.setState(s=>({page:Math.min(this._totalPages(s),s.page+1)}));
+
+  _filtered(s){
+    var q=s.search.trim().toLowerCase();
+    return s.assets.filter(a=>{
+      if(s.filterType&&a.type!==s.filterType)return false;
+      if(s.filterStatus&&a.status!==s.filterStatus)return false;
+      if(s.filterLocation&&a.location!==s.filterLocation)return false;
+      if(q){
+        var hay=(a.tag+' '+a.serial+' '+a.assignedTo).toLowerCase();
+        if(hay.indexOf(q)===-1)return false;
+      }
+      return true;
+    });
+  }
+  _totalPages(s){return Math.max(1,Math.ceil(this._filtered(s).length/s.pageSize));}
+
+  openAdd=()=>this.setState({addOpen:true,addForm:{tag:'',type:'Laptop',brand:'',model:'',serial:'',status:'In Stock',assignedTo:'',location:'',warrantyEnd:''}});
+  closeAdd=()=>this.setState({addOpen:false});
+  closeAddIfBackdrop=(e)=>{if(e.target===e.currentTarget)this.setState({addOpen:false});};
+  stopClick=(e)=>e.stopPropagation();
+
+  makeAddUpdater=(field)=>(e)=>{
+    var v=e.target.value;
+    this.setState(s=>({addForm:Object.assign({},s.addForm,{[field]:v})}));
+  };
+
+  submitAdd=()=>{
+    var f=this.state.addForm;
+    if(!f.tag.trim())return;
+    var nextId=Math.max.apply(null,this.state.assets.map(a=>a.id))+1;
+    var today=fmtDate(TODAY);
+    var asset=Object.assign({},f,{id:nextId,purchaseDate:today,notes:'',log:[{date:today,action:'Created',detail:'ลงทะเบียนทรัพย์สินใหม่',by:'Nattapong T.'}]});
+    this.setState(s=>({assets:[asset].concat(s.assets),addOpen:false,view:'list',page:1}));
+  };
+
+  makeUpdater=(field)=>(e)=>{
+    var v=e.target.value;
+    this.setState(s=>({draft:Object.assign({},s.draft,{[field]:v}),savedFlash:false}));
+  };
+
+  saveDraft=()=>{
+    var d=this.state.draft;
+    var today=fmtDate(TODAY);
+    var newLog=[{date:today,action:'Updated',detail:'แก้ไขข้อมูลทรัพย์สิน',by:'Nattapong T.'}].concat(d.log);
+    var updated=Object.assign({},d,{log:newLog});
+    this.setState(s=>({
+      assets:s.assets.map(a=>a.id===updated.id?updated:a),
+      draft:updated,
+      savedFlash:true
+    }));
+  };
+
+  requestDelete=()=>this.setState({deleteConfirmOpen:true});
+  cancelDelete=()=>this.setState({deleteConfirmOpen:false});
+  confirmDeleteNow=()=>{
+    var id=this.state.draft.id;
+    this.setState(s=>({assets:s.assets.filter(a=>a.id!==id),deleteConfirmOpen:false,view:'list',draft:null,selectedId:null}));
+  };
+
+  triggerImport=(inputId)=>()=>{
+    var input=document.getElementById(inputId||'wdi-import-input');
+    if(input)input.click();
+  };
+
+  _parseCSV=(text)=>{
+    var lines=text.split(/\r\n|\n|\r/).filter(l=>l.trim().length>0);
+    if(lines.length<2)return [];
+    function parseLine(line){
+      var vals=[],cur='',inQ=false;
+      for(var i=0;i<line.length;i++){
+        var c=line[i];
+        if(inQ){
+          if(c==='"'){ if(line[i+1]==='"'){cur+='"';i++;} else inQ=false; }
+          else cur+=c;
+        }else{
+          if(c==='"')inQ=true;
+          else if(c===','){vals.push(cur);cur='';}
+          else cur+=c;
+        }
+      }
+      vals.push(cur);
+      return vals;
+    }
+    var header=parseLine(lines[0]).map(h=>h.trim().toLowerCase());
+    var rows=[];
+    for(var i=1;i<lines.length;i++){
+      var vals=parseLine(lines[i]);
+      var row={};
+      header.forEach((h,idx)=>{row[h]=vals[idx]!==undefined?vals[idx]:'';});
+      rows.push(row);
+    }
+    return rows;
+  };
+
+  handleImportFile=(e)=>{
+    var file=e.target.files&&e.target.files[0];
+    if(!file)return;
+    var reader=new FileReader();
+    reader.onload=()=>{
+      var rows=this._parseCSV(String(reader.result));
+      var today=fmtDate(TODAY);
+      this.setState(s=>{
+        var nextId=Math.max.apply(null,s.assets.map(a=>a.id).concat([0]))+1;
+        var added=rows.filter(r=>r['asset tag']).map(r=>({
+          id:nextId++,
+          tag:r['asset tag']||'',
+          type:r['type']||'Other',
+          brand:r['brand']||'',
+          model:r['model']||'',
+          serial:r['serial']||'',
+          status:STATUS_OPTIONS.indexOf(r['status'])!==-1?r['status']:'In Stock',
+          assignedTo:r['assigned to']||'',
+          location:r['location']||'',
+          purchaseDate:today,
+          warrantyEnd:r['warranty end']||'',
+          notes:'',
+          log:[{date:today,action:'Created',detail:'นำเข้าจากไฟล์ CSV',by:'Nattapong T.'}]
+        }));
+        return {assets:added.concat(s.assets)};
+      });
+    };
+    reader.readAsText(file);
+    e.target.value='';
+  };
+
+  exportCSV=()=>{
+    var s=this.state;
+    var rows=this._filtered(s);
+    var header=['Asset Tag','Type','Brand','Model','Serial','Status','Assigned To','Location','Warranty End'];
+    var lines=[header.join(',')];
+    rows.forEach(a=>{
+      var vals=[a.tag,a.type,a.brand,a.model,a.serial,a.status,a.assignedTo,a.location,a.warrantyEnd];
+      lines.push(vals.map(v=>'"'+String(v||'').replace(/"/g,'""')+'"').join(','));
+    });
+    var blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.download='wdi-assets.csv';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  renderVals(){
+    var s=this.state;
+    var self=this;
+    var t=STRINGS[s.lang]||STRINGS.th;
+    var filtered=this._filtered(s);
+    var totalPages=this._totalPages(s);
+    var page=Math.min(s.page,totalPages);
+    var startIdx=(page-1)*s.pageSize;
+    var pageAssets=filtered.slice(startIdx,startIdx+s.pageSize);
+
+    var pageRows=pageAssets.map(a=>({
+      tag:a.tag,type:a.type,brandModel:a.brand+' '+a.model,serial:a.serial,
+      status:a.status,statusStyle:statusStyle(a.status),
+      assignedTo:a.assignedTo||'—',location:a.location,warrantyEnd:fmtDisplay(a.warrantyEnd),
+      onClick:()=>this.selectAsset(a.id)
+    }));
+
+    var warrantySoon=s.assets
+      .filter(a=>a.status!=='Disposed')
+      .map(a=>({a:a,days:Math.round((new Date(a.warrantyEnd)-TODAY)/86400000)}))
+      .filter(x=>x.days>=0&&x.days<=90)
+      .sort((x,y)=>x.days-y.days)
+      .slice(0,5);
+
+    var warrantySoonRows=warrantySoon.map(x=>({
+      tag:x.a.tag,brandModel:x.a.brand+' '+x.a.model,assignedTo:x.a.assignedTo||'—',
+      location:x.a.location,warrantyEnd:fmtDisplay(x.a.warrantyEnd),
+      onClick:()=>this.selectAsset(x.a.id)
+    }));
+
+    var warrantySoonCount=s.assets.filter(a=>{
+      if(a.status==='Disposed')return false;
+      var days=Math.round((new Date(a.warrantyEnd)-TODAY)/86400000);
+      return days>=0&&days<=90;
+    }).length;
+
+    var draft=s.draft||{tag:'',type:'',brand:'',model:'',serial:'',status:'In Stock',assignedTo:'',location:'',purchaseDate:'',warrantyEnd:'',notes:'',log:[]};
+    var pFrom=filtered.length===0?0:startIdx+1, pTo=Math.min(startIdx+s.pageSize,filtered.length);
+
+    var appliedTheme=this._appliedTheme(s.themeMode);
+
+    return {
+      t:t, lang:s.lang, toggleLang:this.toggleLang,
+      langLabel:s.lang==='th'?t.langLabelTh:t.langLabelEn,
+      theme:appliedTheme, isDark:appliedTheme==='dark', isLight:appliedTheme!=='dark',
+      themeLabel:appliedTheme==='dark'?t.darkMode:t.lightMode,
+      toggleTheme:this.toggleTheme, noop:this.noop,
+      isDashboard:s.view==='dashboard', isList:s.view==='list', isDetail:s.view==='detail', isSettings:s.view==='settings', isWorklog:s.view==='worklog',
+      dashboardActiveClass:s.view==='dashboard'?'active':'', listActiveClass:s.view==='list'?'active':'', settingsActiveClass:s.view==='settings'?'active':'', worklogActiveClass:s.view==='worklog'?'active':'',
+      goDashboard:this.goDashboard, goList:this.goList, goSettings:this.goSettings, goWorklog:this.goWorklog,
+
+      themeMode:s.themeMode, setThemeMode:this.setThemeMode,
+      isThemeLight:s.themeMode==='light', isThemeDark:s.themeMode==='dark', isThemeSystem:s.themeMode==='system',
+      settingsTab:s.settingsTab, setSettingsTab:this.setSettingsTab,
+      isApprTab:s.settingsTab==='appearance', isConfigTab:s.settingsTab==='assetConfig', isDataTab:s.settingsTab==='data',
+      setSettingsTabAppr:()=>this.setSettingsTab('appearance'), setSettingsTabConfig:()=>this.setSettingsTab('assetConfig'), setSettingsTabData:()=>this.setSettingsTab('data'),
+      setThemeLight:()=>this.setThemeMode('light'), setThemeDark:()=>this.setThemeMode('dark'), setThemeSystem:()=>this.setThemeMode('system'),
+      assetTagPrefix:s.assetTagPrefix, updateAssetTagPrefix:this.updateAssetTagPrefix,
+      locationsList:s.locationsList.map((v,i)=>({value:v,idx:i,onInput:this.updateLocationItem(i),onRemove:()=>this.removeLocationItem(i)})),
+      typesList:s.typesList.map((v,i)=>({value:v,idx:i,onInput:this.updateTypeItem(i),onRemove:()=>this.removeTypeItem(i)})),
+      addLocationItem:this.addLocationItem, addTypeItem:this.addTypeItem,
+      exportAllCSV:this.exportAllCSV, triggerImportSettings:this.triggerImport('wdi-import-input-settings'),
+
+      stats:{
+        total:s.assets.length,
+        inUse:s.assets.filter(a=>a.status==='In Use').length,
+        inStock:s.assets.filter(a=>a.status==='In Stock').length,
+        warrantySoonCount:warrantySoonCount
+      },
+      warrantySoonRows:warrantySoonRows,
+      recentActivityRows:RECENT_ACTIVITY,
+
+      logStats:{
+        week:s.workLogs.filter(l=>new Date(l.date)>=startOfWeek(TODAY)).length,
+        month:s.workLogs.filter(l=>new Date(l.date)>=startOfMonth(TODAY)).length
+      },
+      categoryChartRows:(function(){
+        var cutoff=new Date(TODAY); cutoff.setDate(cutoff.getDate()-30);
+        var counts={}; CATEGORY_OPTIONS.forEach(c=>counts[c]=0);
+        s.workLogs.forEach(l=>{ if(new Date(l.date)>=cutoff) counts[l.category]=(counts[l.category]||0)+1; });
+        var max=Math.max.apply(null,CATEGORY_OPTIONS.map(c=>counts[c]).concat([1]));
+        return CATEGORY_OPTIONS.map(c=>({category:c,count:counts[c],pct:Math.round(counts[c]/max*100)+'%'}));
+      })(),
+      heatmapCells:(function(){
+        var days=91;
+        var counts={};
+        s.workLogs.forEach(l=>{ counts[l.date]=(counts[l.date]||0)+1; });
+        var cells=[];
+        for(var i=days-1;i>=0;i--){
+          var d=new Date(TODAY); d.setDate(d.getDate()-i);
+          var iso=fmtDate(d);
+          var c=counts[iso]||0;
+          var level=c===0?'var(--color-neutral-100)':c===1?'var(--color-accent-300)':c===2?'var(--color-accent-500)':'var(--color-accent-700)';
+          cells.push({date:iso,count:c,color:level,tooltip:iso+': '+c});
+        }
+        return cells;
+      })(),
+      recentLogsRows:s.workLogs.slice().sort((a,b)=>{
+        if(a.date!==b.date)return a.date<b.date?1:-1;
+        return a.time<b.time?1:-1;
+      }).slice(0,5).map(l=>({
+        dateDisplay:fmtDisplay(l.date)+' '+l.time, title:l.title,
+        category:l.category, categoryClass:categoryTagClass(l.category),
+        status:l.status, statusStyle:logStatusStyle(l.status),
+        onClick:()=>this.openEditLog(l.id)
+      })),
+
+      search:s.search, updateSearch:this.updateSearch,
+      filterType:s.filterType, filterStatus:s.filterStatus, filterLocation:s.filterLocation,
+      updateFilterType:this.updateFilterType, updateFilterStatus:this.updateFilterStatus, updateFilterLocation:this.updateFilterLocation,
+      hasFilters:!!(s.search||s.filterType||s.filterStatus||s.filterLocation), clearFilters:this.clearFilters,
+      typeOptions:s.typesList, statusOptions:STATUS_OPTIONS, locationOptions:s.locationsList,
+      filteredCountLabel:t.itemsCount(filtered.length,s.assets.length),
+
+      pageRows:pageRows,
+      pageInfoLabel:t.pageInfo(pFrom,pTo,filtered.length,page,totalPages),
+      isFirstPage:page<=1, isLastPage:page>=totalPages,
+      prevPage:this.prevPage, nextPage:this.nextPage,
+      exportCSV:this.exportCSV, triggerImport:this.triggerImport('wdi-import-input'), handleImportFile:this.handleImportFile,
+
+      addOpen:s.addOpen, openAdd:this.openAdd, closeAdd:this.closeAdd, closeAddIfBackdrop:this.closeAddIfBackdrop, stopClick:this.stopClick,
+      addForm:s.addForm, makeAddUpdater:this.makeAddUpdater, submitAdd:this.submitAdd,
+
+      draft:draft, draftStatusStyle:statusStyle(draft.status), makeUpdater:this.makeUpdater, saveDraft:this.saveDraft, savedFlash:s.savedFlash,
+      requestDelete:this.requestDelete, deleteConfirmOpen:s.deleteConfirmOpen, cancelDelete:this.cancelDelete, confirmDeleteNow:this.confirmDeleteNow,
+      deleteConfirmTitle:t.deleteConfirmTitle(draft.tag),
+
+      logSearch:s.logSearch, updateLogSearch:this.updateLogSearch,
+      filterLogCategory:s.filterLogCategory, filterLogStatus:s.filterLogStatus, filterLogRange:s.filterLogRange,
+      updateFilterLogCategory:this.updateFilterLogCategory, updateFilterLogStatus:this.updateFilterLogStatus, updateFilterLogRange:this.updateFilterLogRange,
+      isCustomRange:s.filterLogRange==='custom', customFrom:s.customFrom, customTo:s.customTo,
+      updateCustomFrom:this.updateCustomFrom, updateCustomTo:this.updateCustomTo,
+      hasLogFilters:!!(s.logSearch||s.filterLogCategory||s.filterLogStatus||s.filterLogRange!=='all'), clearLogFilters:this.clearLogFilters,
+      categoryOptions:CATEGORY_OPTIONS, logStatusOptions:LOG_STATUS_OPTIONS,
+      exportLogsCSV:this.exportLogsCSV, exportLogsMarkdown:this.exportLogsMarkdown,
+      openAddLog:this.openAddLog, closeLogDialog:this.closeLogDialog, closeLogDialogIfBackdrop:this.closeLogDialogIfBackdrop,
+      logDialogOpen:s.logDialogOpen, logDialogTitle:s.editingLogId?t.editLogTitle:t.addLogTitle, logDialogSubmitLabel:s.editingLogId?t.save:t.addLog,
+      logForm:s.logForm, makeLogUpdater:this.makeLogUpdater, submitLogForm:this.submitLogForm,
+      assetTagOptions:s.assets.map(a=>a.tag),
+      logGroups:(function(){
+        var filtered=self._filteredLogs(s);
+        var groups=[], byDate={}, order=[];
+        filtered.forEach(l=>{
+          if(!byDate[l.date]){byDate[l.date]=[];order.push(l.date);}
+          byDate[l.date].push(l);
+        });
+        return order.map(d=>({
+          dateLabel:fmtDisplay(d),
+          countLabel:byDate[d].length+' '+(s.lang==='th'?'รายการ':(byDate[d].length===1?'entry':'entries')),
+          entries:byDate[d].map(l=>({
+            time:l.time, title:l.title,
+            hasAsset:!!l.assetTag, assetTag:l.assetTag,
+            category:l.category, categoryClass:categoryTagClass(l.category),
+            status:l.status, statusStyle:logStatusStyle(l.status),
+            durationLabel:l.durationMin?l.durationMin+' '+t.minShort:'—',
+            onClick:()=>self.openEditLog(l.id)
+          }))
+        }));
+      })(),
+      noLogResults:this._filteredLogs(s).length===0
+    };
+  }
+}
+
+</script>
+</body>
+</html>
