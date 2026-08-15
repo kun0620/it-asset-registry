@@ -28,9 +28,11 @@ import { AssetFields } from "../asset-fields";
 export function AssetForm({
   asset,
   locations,
+  types,
 }: {
   asset: Asset;
   locations: string[];
+  types: string[];
 }) {
   const [state, formAction, pending] = useActionState(
     updateAsset.bind(null, asset.id),
@@ -119,6 +121,7 @@ export function AssetForm({
             key={asset.updated_at}
             asset={asset}
             locations={locations}
+            types={types}
             includeNotes
             includePurchaseDate
           />

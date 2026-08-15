@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDateTime, statusBadgeClass } from "@/lib/assets";
-import { getAsset, getAssetLogs, getLocations } from "@/lib/queries";
+import { getAppSettings, getAsset, getAssetLogs } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 import { AssetForm } from "./asset-form";
 
@@ -21,9 +21,9 @@ export default async function AssetDetailPage({
   const asset = await getAsset(id);
   if (!asset) notFound();
 
-  const [logs, locations] = await Promise.all([
+  const [logs, settings] = await Promise.all([
     getAssetLogs(id),
-    getLocations(),
+    getAppSettings(),
   ]);
 
   return (
@@ -49,7 +49,11 @@ export default async function AssetDetailPage({
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.4fr_1fr]">
-        <AssetForm asset={asset} locations={locations} />
+        <AssetForm
+          asset={asset}
+          locations={settings.locations}
+          types={settings.assetTypes}
+        />
 
         <Card className="h-fit">
           <CardHeader>

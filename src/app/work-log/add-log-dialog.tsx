@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,15 +14,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { AppSettings } from "@/lib/queries";
-import { createAsset } from "./actions";
-import { AssetFields } from "./asset-fields";
+import { createLog } from "./actions";
+import { LogFields } from "./log-fields";
 
-export function AddAssetDialog({ settings }: { settings: AppSettings }) {
+export function AddLogDialog({
+  assetOptions,
+}: {
+  assetOptions: { id: string; asset_tag: string }[];
+}) {
   const [open, setOpen] = useState(false);
-  // On success the action redirects to the new asset, so the only state that
-  // ever comes back here is a validation or uniqueness error.
-  const [state, formAction, pending] = useActionState(createAsset, null);
+  const [state, formAction, pending] = useActionState(createLog, null);
+  const wasPending = useRef(false);
+
+  // Close only on the falling edge of a submit that returned no error —
+  // there's no redirect target for a log entry to hang the close off of,
+  // unlike the Add Asset dialog.
+  useEffect(() => {
+    const justFinished = wasPending.current && !pending;
+    wasPending.current = pending;
+    if (justFinished && state === null) setOpen(false);
+  }, [state, pending]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -30,26 +41,21 @@ export function AddAssetDialog({ settings }: { settings: AppSettings }) {
         render={
           <Button>
             <Plus />
-            Add Asset
+            Add Log
           </Button>
         }
       />
       <DialogContent className="sm:max-w-2xl">
         <form action={formAction}>
           <DialogHeader>
-            <DialogTitle>Add Asset</DialogTitle>
+            <DialogTitle>Add Log</DialogTitle>
             <DialogDescription>
-              Register a new asset. You can fill in the remaining details after
-              saving.
+              Record a work log entry, optionally linked to an asset.
             </DialogDescription>
           </DialogHeader>
 
           <div className="py-4">
-            <AssetFields
-              locations={settings.locations}
-              types={settings.assetTypes}
-              assetTagPrefix={settings.assetTagPrefix}
-            />
+            <LogFields assetOptions={assetOptions} />
           </div>
 
           {state?.error && (
@@ -65,7 +71,7 @@ export function AddAssetDialog({ settings }: { settings: AppSettings }) {
               }
             />
             <Button type="submit" disabled={pending}>
-              {pending ? "Adding…" : "Add Asset"}
+              {pending ? "Adding…" : "Add Log"}
             </Button>
           </DialogFooter>
         </form>

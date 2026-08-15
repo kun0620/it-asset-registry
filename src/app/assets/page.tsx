@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDate, statusBadgeClass } from "@/lib/assets";
-import { getAssets, getLocations, type AssetFilters } from "@/lib/queries";
+import { getAppSettings, getAssets, type AssetFilters } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 import { AddAssetDialog } from "./add-asset-dialog";
 import { AssetFilters as AssetFilterBar } from "./asset-filters";
@@ -79,12 +79,12 @@ export default async function AssetListPage({
   const filters = readFilters(params);
   const page = Math.max(1, Number(params.page) || 1);
 
-  const [{ assets, total }, locations] = await Promise.all([
+  const [{ assets, total }, settings] = await Promise.all([
     getAssets(filters, {
       from: (page - 1) * PAGE_SIZE,
       to: page * PAGE_SIZE - 1,
     }),
-    getLocations(),
+    getAppSettings(),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -128,11 +128,14 @@ export default async function AssetListPage({
             <Download />
             Export CSV
           </Button>
-          <AddAssetDialog locations={locations} />
+          <AddAssetDialog settings={settings} />
         </div>
       </div>
 
-      <AssetFilterBar locations={locations} />
+      <AssetFilterBar
+        locations={settings.locations}
+        types={settings.assetTypes}
+      />
 
       <Card className="overflow-hidden py-0">
         <CardContent className="px-0">

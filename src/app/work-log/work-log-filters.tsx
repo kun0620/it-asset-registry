@@ -13,17 +13,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ASSET_STATUSES } from "@/lib/assets";
+import { CATEGORY_OPTIONS, LOG_STATUS_OPTIONS } from "@/lib/worklog";
 
 const ALL = "__all__";
 
-export function AssetFilters({
-  locations,
-  types,
-}: {
-  locations: string[];
-  types: string[];
-}) {
+const RANGE_LABELS: Record<string, string> = {
+  all: "All time",
+  week: "This week",
+  month: "This month",
+  custom: "Custom range",
+};
+
+export function WorkLogFilters() {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -33,8 +34,6 @@ export function AssetFilters({
   const [search, setSearch] = useState(urlQuery);
   const [syncedQuery, setSyncedQuery] = useState(urlQuery);
 
-  // Adjust state during render when the URL changes from outside (e.g. Clear)
-  // rather than in an effect, which would cause a cascading re-render.
   if (urlQuery !== syncedQuery) {
     setSyncedQuery(urlQuery);
     setSearch(urlQuery);
@@ -44,12 +43,9 @@ export function AssetFilters({
     const next = new URLSearchParams(params.toString());
     if (value && value !== ALL) next.set(key, value);
     else next.delete(key);
-    // Any filter change invalidates the current page offset.
-    next.delete("page");
     startTransition(() => router.replace(`${pathname}?${next}`));
   };
 
-  // Typing shouldn't fire a query per keystroke.
   useEffect(() => {
     if (search === urlQuery) return;
     const timer = setTimeout(() => setParam("q", search), 300);
@@ -57,80 +53,94 @@ export function AssetFilters({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, urlQuery]);
 
-  const type = params.get("type") ?? ALL;
+  const range = params.get("range") ?? "all";
+  const category = params.get("category") ?? ALL;
   const status = params.get("status") ?? ALL;
-  const location = params.get("location") ?? ALL;
+  const customFrom = params.get("from") ?? "";
+  const customTo = params.get("to") ?? "";
+
   const hasFilters =
     Boolean(params.get("q")) ||
-    type !== ALL ||
-    status !== ALL ||
-    location !== ALL;
+    range !== "all" ||
+    category !== ALL ||
+    status !== ALL;
+
+  const setCustomDate = (key: "from" | "to", value: string) => {
+    const next = new URLSearchParams(params.toString());
+    if (value) next.set(key, value);
+    else next.delete(key);
+    startTransition(() => router.replace(`${pathname}?${next}`));
+  };
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <div className="relative min-w-60 flex-1 max-w-sm">
+      <div className="relative min-w-56 max-w-sm flex-1">
         <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           className="pl-8"
-          placeholder="Search tag, serial, holder name"
+          placeholder="Search title, detail"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
-      <Select
-        name="type"
-        value={type}
-        onValueChange={(v) => setParam("type", String(v))}
-      >
+      <Select value={range} onValueChange={(v) => setParam("range", String(v))}>
         <SelectTrigger className="w-40">
-          <SelectValue>{(v) => (v === ALL ? "All Types" : String(v))}</SelectValue>
+          <SelectValue>{(v) => RANGE_LABELS[String(v)] ?? "All time"}</SelectValue>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={ALL}>All Types</SelectItem>
-          {types.map((t) => (
-            <SelectItem key={t} value={t}>
-              {t}
+          <SelectItem value="all">All time</SelectItem>
+          <SelectItem value="week">This week</SelectItem>
+          <SelectItem value="month">This month</SelectItem>
+          <SelectItem value="custom">Custom range</SelectItem>
+        </SelectContent>
+      </Select>
+
+      {range === "custom" && (
+        <>
+          <Input
+            type="date"
+            className="w-36"
+            value={customFrom}
+            onChange={(e) => setCustomDate("from", e.target.value)}
+          />
+          <Input
+            type="date"
+            className="w-36"
+            value={customTo}
+            onChange={(e) => setCustomDate("to", e.target.value)}
+          />
+        </>
+      )}
+
+      <Select
+        value={category}
+        onValueChange={(v) => setParam("category", String(v))}
+      >
+        <SelectTrigger className="w-40">
+          <SelectValue>
+            {(v) => (v === ALL ? "All Categories" : String(v))}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={ALL}>All Categories</SelectItem>
+          {CATEGORY_OPTIONS.map((c) => (
+            <SelectItem key={c} value={c}>
+              {c}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      <Select
-        name="status"
-        value={status}
-        onValueChange={(v) => setParam("status", String(v))}
-      >
+      <Select value={status} onValueChange={(v) => setParam("status", String(v))}>
         <SelectTrigger className="w-40">
-          <SelectValue>
-            {(v) => (v === ALL ? "All Statuses" : String(v))}
-          </SelectValue>
+          <SelectValue>{(v) => (v === ALL ? "All Statuses" : String(v))}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL}>All Statuses</SelectItem>
-          {ASSET_STATUSES.map((s) => (
+          {LOG_STATUS_OPTIONS.map((s) => (
             <SelectItem key={s} value={s}>
               {s}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <Select
-        name="location"
-        value={location}
-        onValueChange={(v) => setParam("location", String(v))}
-      >
-        <SelectTrigger className="w-48">
-          <SelectValue>
-            {(v) => (v === ALL ? "All Locations" : String(v))}
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL}>All Locations</SelectItem>
-          {locations.map((l) => (
-            <SelectItem key={l} value={l}>
-              {l}
             </SelectItem>
           ))}
         </SelectContent>

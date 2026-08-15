@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ASSET_STATUSES, ASSET_TYPES, type Asset } from "@/lib/assets";
+import { ASSET_STATUSES, type Asset } from "@/lib/assets";
 import { cn } from "@/lib/utils";
 
 const NO_LOCATION = "__none__";
@@ -42,11 +42,15 @@ function Field({
 export function AssetFields({
   asset,
   locations,
+  types,
+  assetTagPrefix,
   includeNotes = false,
   includePurchaseDate = false,
 }: {
   asset?: Asset;
   locations: string[];
+  types: string[];
+  assetTagPrefix?: string;
   includeNotes?: boolean;
   includePurchaseDate?: boolean;
 }) {
@@ -58,18 +62,18 @@ export function AssetFields({
             id="asset_tag"
             name="asset_tag"
             required
-            placeholder="WDI-NB-021"
+            placeholder={`${assetTagPrefix ?? "WDI-"}NB-021`}
             defaultValue={asset?.asset_tag ?? ""}
           />
         </Field>
 
         <Field label="Type">
-          <Select name="type" defaultValue={asset?.type ?? ASSET_TYPES[0]}>
+          <Select name="type" defaultValue={asset?.type ?? types[0]}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {ASSET_TYPES.map((t) => (
+              {types.map((t) => (
                 <SelectItem key={t} value={t}>
                   {t}
                 </SelectItem>

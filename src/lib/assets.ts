@@ -1,4 +1,18 @@
-export const ASSET_TYPES = [
+export const ASSET_STATUSES = [
+  "In Use",
+  "In Stock",
+  "Repair",
+  "Disposed",
+] as const;
+
+export type AssetStatus = (typeof ASSET_STATUSES)[number];
+
+/**
+ * Types and locations are configured in Settings (`app_settings` table) as
+ * of Phase 2 — these are only the seed values that migration inserts, kept
+ * here as a last-resort fallback if that row is ever missing.
+ */
+export const FALLBACK_ASSET_TYPES = [
   "Laptop",
   "Desktop",
   "Monitor",
@@ -9,19 +23,9 @@ export const ASSET_TYPES = [
   "UPS",
   "Phone",
   "Other",
-] as const;
+];
 
-export const ASSET_STATUSES = [
-  "In Use",
-  "In Stock",
-  "Repair",
-  "Disposed",
-] as const;
-
-export type AssetStatus = (typeof ASSET_STATUSES)[number];
-
-/** Starter list so the location dropdown is not empty on a fresh database. */
-export const DEFAULT_LOCATIONS = [
+export const FALLBACK_LOCATIONS = [
   "Office 2F",
   "Office 3F",
   "Production Line 1",

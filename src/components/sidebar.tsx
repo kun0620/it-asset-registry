@@ -11,13 +11,8 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/", label: "Dashboard", icon: LayoutGrid },
   { href: "/assets", label: "Assets", icon: List },
-];
-
-// Phase 1 covers Dashboard, Asset List and Asset Detail only. These stay as
-// disabled placeholders so the shell matches the mockup without implying scope.
-const DEFERRED = [
-  { label: "Work Log", icon: FileText },
-  { label: "Settings", icon: Settings },
+  { href: "/work-log", label: "Work Log", icon: FileText },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -49,18 +44,6 @@ export function Sidebar() {
             </Button>
           );
         })}
-
-        {DEFERRED.map(({ label, icon: Icon }) => (
-          <Button
-            key={label}
-            variant="ghost"
-            disabled
-            className="justify-start gap-2"
-          >
-            <Icon className="size-4" />
-            {label}
-          </Button>
-        ))}
       </nav>
 
       <div className="mt-auto">
