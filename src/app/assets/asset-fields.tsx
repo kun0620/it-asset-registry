@@ -11,20 +11,23 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ASSET_STATUSES, ASSET_TYPES, type Asset } from "@/lib/assets";
+import { cn } from "@/lib/utils";
 
 const NO_LOCATION = "__none__";
 
 function Field({
   label,
   htmlFor,
+  className,
   children,
 }: {
   label: string;
   htmlFor?: string;
+  className?: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="grid gap-1.5">
+    <div className={cn("grid gap-1.5", className)}>
       <Label htmlFor={htmlFor}>{label}</Label>
       {children}
     </div>
@@ -144,7 +147,14 @@ export function AssetFields({
           </Field>
         )}
 
-        <Field label="Warranty End" htmlFor="warranty_end">
+        {/* Odd field count in the Add dialog (no Purchase Date there) would
+            otherwise leave this alone in its row with an empty half beside
+            it — span it full-width instead of a lopsided last row. */}
+        <Field
+          label="Warranty End"
+          htmlFor="warranty_end"
+          className={!includePurchaseDate ? "sm:col-span-2" : undefined}
+        >
           <Input
             id="warranty_end"
             name="warranty_end"

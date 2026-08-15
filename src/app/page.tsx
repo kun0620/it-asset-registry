@@ -42,8 +42,10 @@ function StatCard({
   return (
     <Card>
       <CardHeader>
-        <CardDescription>{label}</CardDescription>
-        <CardTitle className={cn("font-heading text-3xl", accent)}>
+        <CardDescription className="text-[11px] tracking-wide text-primary uppercase">
+          {label}
+        </CardDescription>
+        <CardTitle className={cn("font-heading text-3xl font-semibold", accent)}>
           {value}
         </CardTitle>
       </CardHeader>
