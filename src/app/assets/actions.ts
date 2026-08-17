@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { ASSET_STATUSES, type AssetStatus } from "@/lib/assets";
+import { parseCsv } from "@/lib/csv";
 
 /** `null` means "no error yet" — the shape `useActionState` starts from. */
 export type ActionResult = { error: string } | null;
@@ -140,4 +141,65 @@ export async function deleteAsset(id: string): Promise<ActionResult> {
 
   revalidateAll();
   redirect("/assets");
+}
+
+export type ImportResult = { error: string } | { count: number } | null;
+
+const STATUS_SET = new Set<string>(ASSET_STATUSES);
+
+export async function importAssetsCsv(
+  _prev: ImportResult,
+  formData: FormData,
+): Promise<ImportResult> {
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Choose a CSV file first." };
+  }
+
+  const rows = parseCsv(await file.text());
+  const inserts = rows
+    .filter((r) => r["asset tag"])
+    .map((r) => ({
+      asset_tag: r["asset tag"],
+      type: r["type"] || "Other",
+      brand: r["brand"] || null,
+      model: r["model"] || null,
+      serial: r["serial"] || null,
+      status: STATUS_SET.has(r["status"])
+        ? (r["status"] as AssetStatus)
+        : ("In Stock" as AssetStatus),
+      assigned_to: r["assigned to"] || null,
+      location: r["location"] || null,
+      purchase_date: r["purchase date"] || null,
+      warranty_end: r["warranty end"] || null,
+    }));
+
+  if (inserts.length === 0) {
+    return { error: "No valid rows found — need an 'Asset Tag' column." };
+  }
+
+  const { data, error } = await supabase
+    .from("assets")
+    .insert(inserts)
+    .select("id");
+  if (error) {
+    return {
+      error:
+        error.code === "23505"
+          ? "Import failed: one or more Asset Tags already exist."
+          : error.message,
+    };
+  }
+
+  const logRows = (data ?? []).map((a) => ({
+    asset_id: a.id,
+    action: "Created",
+    detail: "Imported from CSV",
+  }));
+  if (logRows.length > 0) {
+    await supabase.from("asset_logs").insert(logRows);
+  }
+
+  revalidateAll();
+  return { count: data?.length ?? 0 };
 }

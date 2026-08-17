@@ -17,6 +17,7 @@ import { getAppSettings, getAssets, type AssetFilters } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 import { AddAssetDialog } from "./add-asset-dialog";
 import { AssetFilters as AssetFilterBar } from "./asset-filters";
+import { ImportCsvButton } from "./import-csv-button";
 
 export const dynamic = "force-dynamic";
 
@@ -120,6 +121,7 @@ export default async function AssetListPage({
           </p>
         </div>
         <div className="flex gap-2">
+          <ImportCsvButton />
           <Button
             variant="outline"
             nativeButton={false}
