@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, LayoutGrid, List, Settings } from "lucide-react";
+import { Boxes, FileText, LayoutGrid, List, Settings } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/", label: "Dashboard", icon: LayoutGrid },
   { href: "/assets", label: "Assets", icon: List },
+  { href: "/inventory", label: "Inventory", icon: Boxes },
   { href: "/work-log", label: "Work Log", icon: FileText },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

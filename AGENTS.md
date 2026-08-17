@@ -8,7 +8,7 @@ No multi-tenancy, no org_id, no billing.
 - Tailwind + shadcn/ui
 - Supabase (Postgres + Auth)
 
-## Current scope — Phase 1 + Phase 2 done
+## Current scope — Phase 1 + 2 + 3 done
 Phase 1 — Asset CRUD:
 - Dashboard (asset stat cards, warranty expiring, recent activity)
 - Asset List (table, search, filter by type/status/location, CSV export/import)
@@ -23,6 +23,14 @@ Phase 2 — Work Log + Settings:
   data; Data: export all, CSV import)
 - Dashboard's Work Log Summary section (week/month counts, 30-day category
   breakdown, 91-day activity heatmap, recent logs)
+
+Phase 3 — Inventory:
+- Quantity-tracked consumables/bulk items (cables, adapters, etc.) —
+  deliberately separate from `assets`, which is for individually-tracked
+  capital equipment. Search by name, add/edit/delete via a per-row dialog.
+  No reorder/low-stock alerts, no Work Log linkage, no CSV export/import,
+  no Dashboard integration — quantity is edited directly on the page.
+  Any of these can be added later without a schema change.
 
 ## Deferred — do NOT build yet
 Network monitoring, i18n, ticketing, user management, auth.
@@ -49,6 +57,11 @@ work_logs
 app_settings — singleton row (id boolean pk, always true)
   asset_tag_prefix text, locations text[], asset_types text[],
   updated_at timestamptz
+
+inventory_items
+  id uuid pk, name text, quantity int (>= 0), unit text (default 'pcs'),
+  location text (free text, not FK'd to app_settings.locations),
+  notes text, created_at timestamptz, updated_at timestamptz
 
 Status values: In Use | In Stock | Repair | Disposed
 Work log category values: Incident | Maintenance | Project | Procurement |

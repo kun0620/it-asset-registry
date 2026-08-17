@@ -13,6 +13,7 @@ import {
   startOfWeek,
   type WorkLogWithAsset,
 } from "@/lib/worklog";
+import type { InventoryItem } from "@/lib/inventory";
 
 export type AssetFilters = {
   q?: string;
@@ -249,4 +250,14 @@ export async function getWorkLogStats() {
     heatmap,
     recent: (recentRows ?? []) as unknown as WorkLogWithAsset[],
   };
+}
+
+export async function getInventoryItems(q?: string): Promise<InventoryItem[]> {
+  let query = supabase.from("inventory_items").select("*");
+  if (q?.trim()) {
+    query = query.ilike("name", `%${q.trim()}%`);
+  }
+  const { data, error } = await query.order("name");
+  if (error) throw error;
+  return (data ?? []) as InventoryItem[];
 }
