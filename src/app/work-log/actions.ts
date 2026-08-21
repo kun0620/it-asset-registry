@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import {
   CATEGORY_OPTIONS,
   LOG_STATUS_OPTIONS,
@@ -52,6 +52,7 @@ export async function createLog(
   if (!values.title) return { error: "Title is required." };
   if (!values.log_date) return { error: "Date is required." };
 
+  const supabase = await createClient();
   const { error } = await supabase.from("work_logs").insert(values);
   if (error) return { error: error.message };
 
@@ -68,6 +69,7 @@ export async function updateLog(
   if (!values.title) return { error: "Title is required." };
   if (!values.log_date) return { error: "Date is required." };
 
+  const supabase = await createClient();
   const { error } = await supabase
     .from("work_logs")
     .update(values)

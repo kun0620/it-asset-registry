@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 export type ActionResult = { error: string } | null;
 
@@ -32,6 +32,7 @@ export async function createInventoryItem(
   const values = readForm(formData);
   if (!values.name) return { error: "Name is required." };
 
+  const supabase = await createClient();
   const { error } = await supabase.from("inventory_items").insert(values);
   if (error) return { error: error.message };
 
@@ -47,6 +48,7 @@ export async function updateInventoryItem(
   const values = readForm(formData);
   if (!values.name) return { error: "Name is required." };
 
+  const supabase = await createClient();
   const { error } = await supabase
     .from("inventory_items")
     .update(values)
@@ -58,6 +60,7 @@ export async function updateInventoryItem(
 }
 
 export async function deleteInventoryItem(id: string): Promise<ActionResult> {
+  const supabase = await createClient();
   const { error } = await supabase
     .from("inventory_items")
     .delete()

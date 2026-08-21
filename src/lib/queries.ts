@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import {
   FALLBACK_ASSET_TYPES,
   FALLBACK_LOCATIONS,
@@ -30,6 +30,7 @@ export async function getAssets(
   filters: AssetFilters,
   range?: { from: number; to: number },
 ): Promise<{ assets: Asset[]; total: number }> {
+  const supabase = await createClient();
   let filtered = supabase.from("assets").select("*", { count: "exact" });
 
   if (filters.type) filtered = filtered.eq("type", filters.type);
@@ -54,6 +55,7 @@ export async function getAssets(
 }
 
 export async function getAsset(id: string): Promise<Asset | null> {
+  const supabase = await createClient();
   const { data } = await supabase
     .from("assets")
     .select("*")
@@ -63,6 +65,7 @@ export async function getAsset(id: string): Promise<Asset | null> {
 }
 
 export async function getAssetLogs(assetId: string): Promise<AssetLog[]> {
+  const supabase = await createClient();
   const { data } = await supabase
     .from("asset_logs")
     .select("*")
@@ -75,6 +78,7 @@ export async function getAssetLogs(assetId: string): Promise<AssetLog[]> {
 export async function getAssetOptions(): Promise<
   { id: string; asset_tag: string }[]
 > {
+  const supabase = await createClient();
   const { data } = await supabase
     .from("assets")
     .select("id, asset_tag")
@@ -94,6 +98,7 @@ export type AppSettings = {
  * all read from this, not from what assets happen to already use.
  */
 export async function getAppSettings(): Promise<AppSettings> {
+  const supabase = await createClient();
   const { data } = await supabase
     .from("app_settings")
     .select("asset_tag_prefix, locations, asset_types")
@@ -112,6 +117,7 @@ export type RecentActivity = AssetLog & {
 };
 
 export async function getDashboardData() {
+  const supabase = await createClient();
   const [{ data: assetRows }, { data: logRows }] = await Promise.all([
     supabase.from("assets").select("*"),
     supabase
@@ -157,6 +163,7 @@ const WORK_LOG_SELECT = "*, asset:assets(id, asset_tag)";
 export async function getWorkLogs(
   filters: WorkLogFilters,
 ): Promise<WorkLogWithAsset[]> {
+  const supabase = await createClient();
   let query = supabase.from("work_logs").select(WORK_LOG_SELECT);
 
   if (filters.category) query = query.eq("category", filters.category);
@@ -177,18 +184,10 @@ export async function getWorkLogs(
   return (data ?? []) as unknown as WorkLogWithAsset[];
 }
 
-export async function getWorkLog(id: string): Promise<WorkLogWithAsset | null> {
-  const { data } = await supabase
-    .from("work_logs")
-    .select(WORK_LOG_SELECT)
-    .eq("id", id)
-    .maybeSingle();
-  return (data as unknown as WorkLogWithAsset) ?? null;
-}
-
 /** Dashboard's Work Log Summary: this-week/month counts, 30-day category
  * breakdown, a 91-day activity heatmap, and the 5 most recent entries. */
 export async function getWorkLogStats() {
+  const supabase = await createClient();
   const today = new Date();
   const thirtyDaysAgo = new Date(today);
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);
@@ -253,6 +252,7 @@ export async function getWorkLogStats() {
 }
 
 export async function getInventoryItems(q?: string): Promise<InventoryItem[]> {
+  const supabase = await createClient();
   let query = supabase.from("inventory_items").select("*");
   if (q?.trim()) {
     query = query.ilike("name", `%${q.trim()}%`);

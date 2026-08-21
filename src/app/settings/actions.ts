@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 export type ActionResult = { error: string } | null;
 
@@ -27,6 +27,7 @@ export async function updateAppSettings(
     .map((v) => String(v).trim())
     .filter(Boolean);
 
+  const supabase = await createClient();
   const { error } = await supabase
     .from("app_settings")
     .update({

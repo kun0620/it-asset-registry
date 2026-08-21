@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Boxes, FileText, LayoutGrid, List, Settings } from "lucide-react";
+import { Boxes, FileText, LayoutGrid, List, LogOut, Settings } from "lucide-react";
 
+import { signOut } from "@/app/login/actions";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -49,10 +50,20 @@ export function Sidebar() {
 
       <div className="mt-auto">
         <Separator className="my-3" />
-        <div className="px-2 pb-1 text-xs">
+        <div className="px-2 pb-2 text-xs">
           <div className="font-medium">Nattapong T.</div>
           <div className="text-muted-foreground">IT Engineer</div>
         </div>
+        <form action={signOut}>
+          <Button
+            type="submit"
+            variant="ghost"
+            className="w-full justify-start gap-2 text-foreground"
+          >
+            <LogOut className="size-4" />
+            Log out
+          </Button>
+        </form>
       </div>
     </aside>
   );

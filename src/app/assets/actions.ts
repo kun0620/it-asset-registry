@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import { ASSET_STATUSES, type AssetStatus } from "@/lib/assets";
 import { parseCsv } from "@/lib/csv";
 
@@ -51,6 +51,7 @@ export async function createAsset(
   if (!values.asset_tag) return { error: "Asset Tag is required." };
   if (!values.type) return { error: "Type is required." };
 
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("assets")
     .insert(values)
@@ -87,6 +88,7 @@ export async function updateAsset(
   if (!values.asset_tag) return { error: "Asset Tag is required." };
   if (!values.type) return { error: "Type is required." };
 
+  const supabase = await createClient();
   const { data: before, error: readError } = await supabase
     .from("assets")
     .select("status, assigned_to")
@@ -136,6 +138,7 @@ export async function updateAsset(
 }
 
 export async function deleteAsset(id: string): Promise<ActionResult> {
+  const supabase = await createClient();
   const { error } = await supabase.from("assets").delete().eq("id", id);
   if (error) return { error: error.message };
 
@@ -178,6 +181,7 @@ export async function importAssetsCsv(
     return { error: "No valid rows found — need an 'Asset Tag' column." };
   }
 
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("assets")
     .insert(inserts)
